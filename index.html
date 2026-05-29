@@ -24,38 +24,44 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;backgrou
 .btn-secondary{background:#f1f3f5;color:#111;border:1px solid #ddd}
 .btn-sm{padding:8px 14px;font-size:13px}
 .team-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-bottom:1.5rem}
-.team-btn{padding:16px 8px;border-radius:12px;border:none;cursor:pointer;font-size:14px;font-weight:600;color:#fff;text-align:center;transition:all 0.15s;opacity:0.85}
+.team-btn{padding:14px 8px;border-radius:12px;border:none;cursor:pointer;font-size:14px;font-weight:600;color:#fff;text-align:center;transition:all 0.15s;opacity:0.85}
 .team-btn:hover{opacity:1;transform:translateY(-1px)}
 .team-btn.selected{outline:3px solid #111;outline-offset:2px;opacity:1;transform:translateY(-1px)}
 .team-btn.blue{background:#1a87c8}
 .team-btn.red{background:#e8472a}
-.field-label{font-size:13px;font-weight:600;color:#444;margin-bottom:6px}
-.input-title{width:100%;padding:12px 14px;border-radius:10px;border:1.5px solid #dee2e6;background:#fff;color:#111;font-size:15px;font-family:inherit;outline:none;line-height:1.5}
+.section-label{font-size:13px;font-weight:600;color:#444;margin-bottom:8px;display:flex;align-items:center;gap:4px}
+.section-label .required{color:#e8472a;font-size:11px}
+.input-title{width:100%;padding:12px 14px;border-radius:10px;border:1.5px solid #dee2e6;background:#f8f9fa;color:#111;font-size:15px;font-family:inherit;outline:none;line-height:1.5}
+.input-title.editable{background:#fff}
 .input-title:focus{border-color:#666}
+.input-title[readonly]{color:#555;cursor:default}
 .input-area{width:100%;min-height:110px;padding:12px 14px;border-radius:10px;border:1.5px solid #dee2e6;background:#fff;color:#111;font-size:15px;font-family:inherit;resize:vertical;outline:none;line-height:1.6}
 .input-area:focus{border-color:#666}
 .char-count{font-size:12px;color:#aaa;text-align:right;margin-top:4px}
 .field-gap{height:14px}
-.submit-row{display:flex;align-items:center;justify-content:space-between;margin-top:1.2rem}
+.submit-row{margin-top:1.2rem}
 .success-wrap{text-align:center;padding:3rem 1rem}
 .success-icon{font-size:52px;color:#22c55e;margin-bottom:1rem}
 .success-wrap h2{font-size:20px;font-weight:600;margin-bottom:8px;color:#111}
 .success-wrap p{color:#666;font-size:14px;margin-bottom:2rem}
 .feed-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:1rem}
-.filter-row{display:flex;gap:6px;flex-wrap:wrap}
-.filter-chip{padding:5px 12px;border-radius:20px;border:1.5px solid #dee2e6;background:#f8f9fa;font-size:12px;color:#666;cursor:pointer;font-weight:500}
+.filter-scroll{overflow-x:auto;white-space:nowrap;margin-bottom:10px;padding-bottom:4px;-webkit-overflow-scrolling:touch}
+.filter-scroll::-webkit-scrollbar{height:3px}
+.filter-scroll::-webkit-scrollbar-track{background:#f1f3f5;border-radius:2px}
+.filter-scroll::-webkit-scrollbar-thumb{background:#dee2e6;border-radius:2px}
+.filter-row{display:inline-flex;gap:6px}
+.filter-chip{padding:5px 12px;border-radius:20px;border:1.5px solid #dee2e6;background:#f8f9fa;font-size:12px;color:#666;cursor:pointer;font-weight:500;white-space:nowrap;flex-shrink:0;transition:all 0.15s}
 .filter-chip.active{background:#111;color:#fff;border-color:#111}
 .feed{display:flex;flex-direction:column;gap:10px}
 .opinion-card{padding:14px 16px;border-radius:12px;background:#f8f9fa;border:1px solid #e9ecef;animation:slideIn 0.3s ease}
 @keyframes slideIn{from{opacity:0;transform:translateY(-6px)}to{opacity:1;transform:translateY(0)}}
 .card-meta{display:flex;align-items:center;justify-content:space-between;margin-bottom:8px}
+.card-meta-left{display:flex;align-items:center;gap:6px;flex-wrap:wrap}
 .team-tag{font-size:12px;font-weight:700;padding:3px 10px;border-radius:6px;color:#fff}
 .team-tag.blue{background:#1a87c8}
 .team-tag.red{background:#e8472a}
-.card-right{display:flex;align-items:center;gap:8px}
+.topic-tag{font-size:11px;font-weight:500;padding:3px 8px;border-radius:6px;background:#e9ecef;color:#555}
 .card-time{font-size:11px;color:#aaa}
-.card-del{border:none;background:none;cursor:pointer;color:#ccc;font-size:16px;padding:2px 4px;border-radius:4px}
-.card-del:hover{color:#ef4444}
 .card-title-text{font-size:14px;font-weight:600;color:#111;margin-bottom:4px}
 .card-text{font-size:14px;color:#444;line-height:1.7;margin-bottom:10px}
 .card-footer{display:flex;align-items:center;margin-top:6px}
@@ -75,31 +81,25 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;backgrou
 .team-stat-name{font-size:13px;color:#333;width:60px;flex-shrink:0;font-weight:500}
 .team-stat-bar-wrap{flex:1;height:8px;background:#e9ecef;border-radius:4px;overflow:hidden}
 .team-stat-bar{height:100%;border-radius:4px;transition:width 0.4s}
-.team-stat-count{font-size:12px;color:#888;width:30px;text-align:right}
+.team-stat-count{font-size:12px;color:#888;width:36px;text-align:right}
 .bottom-nav{border-top:1px solid #f1f3f5;padding:10px 0 0;display:flex;justify-content:space-around;margin-top:2rem}
 .nav-item{flex:1;padding:8px 4px;border-radius:10px;border:none;background:none;cursor:pointer;font-size:11px;color:#999;display:flex;flex-direction:column;align-items:center;gap:3px;font-weight:500}
 .nav-item i{font-size:20px}
 .nav-item.active{color:#111;background:#f1f3f5}
-.clear-btn{font-size:12px;color:#ef4444;background:none;border:1px solid #fecaca;border-radius:6px;padding:4px 10px;cursor:pointer;white-space:nowrap;flex-shrink:0}
-.clear-btn:hover{background:#fff5f5}
 .modal-overlay{display:none;position:fixed;top:0;left:0;right:0;bottom:0;background:rgba(0,0,0,0.5);z-index:999;align-items:center;justify-content:center}
 .modal-overlay.show{display:flex}
 .modal{background:#fff;border-radius:16px;padding:1.5rem;width:300px;text-align:center;box-shadow:0 8px 32px rgba(0,0,0,0.15)}
 .modal h3{font-size:17px;font-weight:600;color:#111;margin-bottom:6px}
 .modal p{font-size:13px;color:#888;margin-bottom:1.2rem}
-.pw-input{width:100%;padding:11px 14px;border-radius:10px;border:1.5px solid #dee2e6;font-size:20px;text-align:center;letter-spacing:8px;outline:none;color:#111;font-family:inherit;margin-bottom:8px}
-.pw-input:focus{border-color:#666}
-.pw-error{font-size:12px;color:#ef4444;margin-bottom:10px;min-height:18px}
-.modal-btns{display:flex;gap:8px}
-.modal-btns button{flex:1;padding:10px;border-radius:8px;border:none;cursor:pointer;font-size:14px;font-weight:500}
-.modal-cancel{background:#f1f3f5;color:#666}
-.modal-confirm{background:#111;color:#fff}
 .heart-team-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-bottom:1rem}
 .heart-team-btn{padding:12px 6px;border-radius:10px;border:none;cursor:pointer;font-size:13px;font-weight:600;color:#fff;text-align:center;transition:all 0.15s;opacity:0.85}
 .heart-team-btn:hover{opacity:1;transform:translateY(-1px)}
 .heart-team-btn.blue{background:#1a87c8}
 .heart-team-btn.red{background:#e8472a}
 .heart-team-btn:disabled{opacity:0.3;cursor:not-allowed;transform:none}
+.topic-badge{display:inline-block;padding:6px 12px;border-radius:8px;background:#f1f3f5;font-size:13px;font-weight:600;color:#555;margin-bottom:14px}
+.selected-team-info{display:inline-flex;align-items:center;gap:6px;padding:6px 14px;border-radius:10px;font-size:14px;font-weight:600;color:#fff;margin-bottom:14px}
+.auto-title-hint{font-size:12px;color:#888;margin-bottom:6px;display:flex;align-items:center;gap:4px}
 </style>
 </head>
 <body>
@@ -114,34 +114,46 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;backgrou
     <div class="banner">
       <img src="banner.png" alt="스마일멘토 시즌5">
     </div>
+
+    <!-- 접수 중단 배너 -->
     <div id="closed-banner" style="display:none;background:#fff8e1;border:1.5px solid #ffe082;border-radius:12px;padding:1.5rem;text-align:center;margin-bottom:1.2rem">
       <div style="font-size:36px;margin-bottom:8px">🧃</div>
       <div style="font-size:16px;font-weight:500;color:#7c5700;margin-bottom:4px">지금은 활동에 집중할 시간!</div>
       <div style="font-size:14px;color:#a07020">의견 접수를 잠깐 멈춰주세요!</div>
     </div>
-    <div id="step-team">
+
+    <!-- 통합 제출 폼 -->
+    <div id="step-form">
       <div class="page-title">함께 나누고 싶은 의견을 작성해주세요!</div>
-      <div class="page-sub">팀을 선택한 후 의견을 입력해주세요</div>
+      <div class="page-sub">팀을 선택하고 의견을 입력해주세요</div>
+
+      <!-- 팀 선택 -->
+      <div class="section-label">팀 선택 <span class="required">필수</span></div>
       <div class="team-grid" id="team-grid"></div>
-      <button class="btn btn-primary" style="width:100%" id="next-btn" disabled>
-        <i class="ti ti-arrow-right"></i> 다음
-      </button>
-    </div>
-    <div id="step-input" style="display:none">
-      <div class="page-title">의견을 입력해주세요</div>
-      <div class="page-sub" id="input-sub"></div>
-      <div class="field-label">제목</div>
+
+      <!-- 제목 (자동/직접입력) -->
+      <div class="section-label">제목 <span class="required">필수</span></div>
+      <div id="auto-title-hint" class="auto-title-hint" style="display:none">
+        <i class="ti ti-sparkles" style="font-size:13px;color:#1a87c8"></i>
+        <span id="auto-title-hint-text">주제가 자동으로 입력되었습니다</span>
+      </div>
       <input type="text" class="input-title" id="opinion-title" placeholder="의견 제목을 입력해주세요" maxlength="50">
       <div class="char-count"><span id="title-num">0</span> / 50</div>
       <div class="field-gap"></div>
-      <div class="field-label">내용</div>
+
+      <!-- 내용 -->
+      <div class="section-label">내용 <span class="required">필수</span></div>
       <textarea class="input-area" id="opinion-text" placeholder="자유롭게 의견을 작성해주세요..." maxlength="300"></textarea>
       <div class="char-count"><span id="char-num">0</span> / 300</div>
+
       <div class="submit-row">
-        <button class="btn btn-secondary btn-sm" id="back-btn"><i class="ti ti-arrow-left"></i> 팀 변경</button>
-        <button class="btn btn-primary" id="submit-btn" disabled><i class="ti ti-send"></i> 제출</button>
+        <button class="btn btn-primary" style="width:100%" id="submit-btn" disabled>
+          <i class="ti ti-send"></i> 의견 제출하기
+        </button>
       </div>
     </div>
+
+    <!-- 제출 완료 -->
     <div id="step-done" style="display:none">
       <div class="success-wrap">
         <div class="success-icon"><i class="ti ti-circle-check"></i></div>
@@ -150,6 +162,7 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;backgrou
         <button class="btn btn-primary" id="reset-btn"><i class="ti ti-plus"></i> 추가 의견 제출</button>
       </div>
     </div>
+
     <div class="bottom-nav">
       <button class="nav-item active" data-nav="submit"><i class="ti ti-pencil"></i><span>의견 제출</span></button>
       <button class="nav-item" data-nav="feed"><i class="ti ti-messages"></i><span>의견 살펴보기</span></button>
@@ -161,9 +174,10 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;backgrou
   <div class="view" id="view-feed">
     <div class="feed-header">
       <div class="page-title" style="margin-bottom:0">의견 살펴보기</div>
-      <button class="clear-btn" id="clear-all-btn">전체 삭제</button>
     </div>
-    <div class="filter-row" id="filter-row" style="margin-bottom:10px"></div>
+    <div class="filter-scroll">
+      <div class="filter-row" id="filter-row"></div>
+    </div>
     <div class="feed" id="feed"></div>
     <div class="bottom-nav">
       <button class="nav-item" data-nav="submit"><i class="ti ti-pencil"></i><span>의견 제출</span></button>
@@ -174,10 +188,7 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;backgrou
 
   <!-- 참여현황 뷰 -->
   <div class="view" id="view-stats">
-    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:1rem">
-      <div class="page-title" style="margin-bottom:0">참여현황</div>
-      <button id="toggle-btn" style="display:inline-flex;align-items:center;gap:6px;padding:7px 14px;border-radius:8px;border:1.5px solid #dee2e6;background:#f1f3f5;color:#444;font-size:13px;font-weight:500;cursor:pointer"><i class="ti ti-player-pause" id="toggle-icon"></i><span id="toggle-label">접수 중</span></button>
-    </div>
+    <div class="page-title" style="margin-bottom:1rem">참여현황</div>
     <div class="stats-top">
       <div class="stat-card">
         <div class="stat-num" id="total-count">0</div>
@@ -193,9 +204,9 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;backgrou
       </div>
     </div>
     <div class="stat-sub-tabs">
-      <button class="stat-sub-btn active" id="sub-opinion-btn">팀별 의견 참여</button>
-      <button class="stat-sub-btn" id="sub-heart-btn">팀별 하트 현황</button>
-      <button class="stat-sub-btn" id="sub-participation-btn">팀별 참여 현황</button>
+      <button class="stat-sub-btn active" id="sub-opinion-btn">팀별 의견</button>
+      <button class="stat-sub-btn" id="sub-heart-btn">팀별 하트</button>
+      <button class="stat-sub-btn" id="sub-participation-btn">팀별 참여</button>
       <button class="stat-sub-btn" id="sub-ranking-btn">🍦 순위표</button>
     </div>
     <div id="stat-detail"></div>
@@ -207,33 +218,19 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;backgrou
   </div>
 </div>
 
-<!-- 비밀번호 모달 -->
-<div class="modal-overlay" id="pw-modal">
-  <div class="modal">
-    <h3>🔒 비밀번호 확인</h3>
-    <p id="pw-modal-desc">삭제하려면 비밀번호를 입력하세요</p>
-    <input type="password" class="pw-input" id="pw-input" maxlength="10" placeholder="••••••">
-    <div class="pw-error" id="pw-error"></div>
-    <div class="modal-btns">
-      <button class="modal-cancel" id="pw-cancel-btn">취소</button>
-      <button class="modal-confirm" id="pw-confirm-btn">확인</button>
-    </div>
-  </div>
-</div>
-
 <!-- 하트 팀 선택 모달 -->
 <div class="modal-overlay" id="heart-modal">
   <div class="modal">
     <h3>❤️ 우리 팀은?</h3>
     <p>하트를 누를 팀을 선택하세요</p>
     <div class="heart-team-grid" id="heart-team-grid"></div>
-    <button class="modal-cancel" style="width:100%;padding:10px;border-radius:8px;border:none;cursor:pointer;font-size:14px;font-weight:500;background:#f1f3f5;color:#666" id="heart-cancel-btn">취소</button>
+    <button style="width:100%;padding:10px;border-radius:8px;border:none;cursor:pointer;font-size:14px;font-weight:500;background:#f1f3f5;color:#666" id="heart-cancel-btn">취소</button>
   </div>
 </div>
 
 <script type="module">
 import { initializeApp } from "https://www.gstatic.com/firebasejs/12.14.0/firebase-app.js";
-import { getDatabase, ref, push, onValue, remove, runTransaction } from "https://www.gstatic.com/firebasejs/12.14.0/firebase-database.js";
+import { getDatabase, ref, push, onValue, runTransaction } from "https://www.gstatic.com/firebasejs/12.14.0/firebase-database.js";
 
 const firebaseConfig = {
   apiKey: "AIzaSyD6TOv4ro8LGNDUfrmeXz5YOf6CYc7dbR0",
@@ -248,30 +245,30 @@ const firebaseConfig = {
 const fbApp = initializeApp(firebaseConfig);
 const db = getDatabase(fbApp);
 const opinionsRef = ref(db, 'opinions');
-const settingsRef = ref(db, 'settings/active');
+const activeRef = ref(db, 'settings/active');
+const questionRef = ref(db, 'settings/question');
 
 const TEAMS = ['Team1','Team2','Team3','Team4','Team5','Team6','Team7','Team8','Team9','Team10','Team11'];
 const TEAM_COLOR = i => i < 4 ? 'blue' : 'red';
 const BAR_COLOR = i => i < 4 ? '#1a87c8' : '#e8472a';
-const PW = '930522';
+
+const TOPICS = ['응원메시지자랑','우리가꿈꾸는활동','재미있는활동아이디어','자유입력'];
 
 function getLikedMap() {
   try { return JSON.parse(localStorage.getItem('sm5_liked') || '{}'); } catch { return {}; }
 }
-function setLiked(opinionKey, teamIdx) {
-  const m = getLikedMap(); m[opinionKey] = teamIdx;
+function setLiked(key, teamIdx) {
+  const m = getLikedMap(); m[key] = teamIdx;
   localStorage.setItem('sm5_liked', JSON.stringify(m));
 }
 
 let opinions = [];
 let selectedTeam = null;
 let currentFilter = 'all';
-let pendingDeleteKey = null;
-let pendingDeleteAll = false;
 let pendingHeartKey = null;
 let currentStatTab = 'opinion';
 let isActive = true;
-let pendingToggle = false;
+let currentQuestion = '자유입력';
 
 // 연결 상태
 function setConnected(ok) {
@@ -283,7 +280,9 @@ function setConnected(ok) {
 function switchView(name) {
   document.querySelectorAll('.view').forEach(v => v.classList.remove('active'));
   document.getElementById('view-' + name).classList.add('active');
+  document.querySelectorAll('[data-nav]').forEach(b => b.classList.toggle('active', b.dataset.nav === name));
   if (name === 'stats') renderStats();
+  if (name === 'feed') renderFeed();
 }
 
 document.querySelectorAll('[data-nav]').forEach(btn => {
@@ -300,7 +299,7 @@ TEAMS.forEach((t, i) => {
     document.querySelectorAll('.team-btn').forEach(x => x.classList.remove('selected'));
     b.classList.add('selected');
     selectedTeam = i;
-    document.getElementById('next-btn').disabled = false;
+    updateSubmitBtn();
   });
   grid.appendChild(b);
 });
@@ -315,29 +314,48 @@ TEAMS.forEach((t, i) => {
   heartGrid.appendChild(b);
 });
 
-// 다음
-document.getElementById('next-btn').addEventListener('click', () => {
-  if (selectedTeam === null) return;
-  document.getElementById('step-team').style.display = 'none';
-  document.getElementById('step-input').style.display = 'block';
-  const hex = TEAM_COLOR(selectedTeam) === 'blue' ? '#1a87c8' : '#e8472a';
-  document.getElementById('input-sub').innerHTML = `<strong style="color:${hex}">${TEAMS[selectedTeam]}</strong>의 의견을 작성해주세요`;
-  document.getElementById('opinion-title').focus();
+// 입력 이벤트
+document.getElementById('opinion-title').addEventListener('input', () => {
+  document.getElementById('title-num').textContent = document.getElementById('opinion-title').value.length;
+  updateSubmitBtn();
+});
+document.getElementById('opinion-text').addEventListener('input', () => {
+  document.getElementById('char-num').textContent = document.getElementById('opinion-text').value.length;
+  updateSubmitBtn();
 });
 
-document.getElementById('back-btn').addEventListener('click', () => {
-  document.getElementById('step-input').style.display = 'none';
-  document.getElementById('step-team').style.display = 'block';
-});
+function updateSubmitBtn() {
+  const t = document.getElementById('opinion-title').value.trim();
+  const c = document.getElementById('opinion-text').value.trim();
+  document.getElementById('submit-btn').disabled = (selectedTeam === null || t.length === 0 || c.length === 0);
+}
 
-document.getElementById('opinion-title').addEventListener('input', updateBtn);
-document.getElementById('opinion-text').addEventListener('input', updateBtn);
-function updateBtn() {
-  const t = document.getElementById('opinion-title').value;
-  const c = document.getElementById('opinion-text').value;
-  document.getElementById('title-num').textContent = t.length;
-  document.getElementById('char-num').textContent = c.length;
-  document.getElementById('submit-btn').disabled = t.trim().length === 0 || c.trim().length === 0;
+// 질문 주제 변경 시 제목 자동입력
+function applyQuestion(q) {
+  currentQuestion = q || '자유입력';
+  const titleInput = document.getElementById('opinion-title');
+  const hint = document.getElementById('auto-title-hint');
+  const hintText = document.getElementById('auto-title-hint-text');
+  if (currentQuestion === '자유입력') {
+    titleInput.readOnly = false;
+    titleInput.classList.add('editable');
+    titleInput.placeholder = '의견 제목을 직접 입력해주세요';
+    if (titleInput.dataset.autoFilled === 'true') {
+      titleInput.value = '';
+      titleInput.dataset.autoFilled = 'false';
+      document.getElementById('title-num').textContent = '0';
+    }
+    hint.style.display = 'none';
+  } else {
+    titleInput.readOnly = true;
+    titleInput.classList.remove('editable');
+    titleInput.value = currentQuestion;
+    titleInput.dataset.autoFilled = 'true';
+    document.getElementById('title-num').textContent = currentQuestion.length;
+    hintText.textContent = `"${currentQuestion}" 주제로 자동 설정되었습니다`;
+    hint.style.display = 'flex';
+  }
+  updateSubmitBtn();
 }
 
 // 제출
@@ -346,80 +364,43 @@ document.getElementById('submit-btn').addEventListener('click', async () => {
   const text = document.getElementById('opinion-text').value.trim();
   if (!title || !text || selectedTeam === null) return;
   const btn = document.getElementById('submit-btn');
-  btn.disabled = true; btn.innerHTML = '전송 중...';
+  btn.disabled = true;
+  btn.innerHTML = '<i class="ti ti-loader" style="animation:spin 1s linear infinite"></i> 전송 중...';
   try {
-    await push(opinionsRef, { team: selectedTeam, title, text, time: Date.now(), hearts: {} });
-    document.getElementById('step-input').style.display = 'none';
+    await push(opinionsRef, {
+      team: selectedTeam,
+      title,
+      topic: currentQuestion,
+      text,
+      time: Date.now(),
+      hearts: {}
+    });
+    document.getElementById('step-form').style.display = 'none';
     document.getElementById('step-done').style.display = 'block';
-    document.getElementById('done-sub').textContent = `${TEAMS[selectedTeam]} 의견이 전송되었습니다`;
+    document.getElementById('done-sub').textContent = `${TEAMS[selectedTeam]}의 의견이 전송되었습니다`;
     document.getElementById('opinion-title').value = '';
     document.getElementById('opinion-text').value = '';
+    document.getElementById('opinion-title').dataset.autoFilled = 'false';
     document.getElementById('title-num').textContent = '0';
     document.getElementById('char-num').textContent = '0';
   } catch(e) {
     alert('전송 실패: ' + e.message);
-    btn.disabled = false; btn.innerHTML = '<i class="ti ti-send"></i> 제출';
+    btn.disabled = false;
+    btn.innerHTML = '<i class="ti ti-send"></i> 의견 제출하기';
   }
 });
 
 document.getElementById('reset-btn').addEventListener('click', () => {
   selectedTeam = null;
   document.querySelectorAll('.team-btn').forEach(b => b.classList.remove('selected'));
-  document.getElementById('next-btn').disabled = true;
   document.getElementById('step-done').style.display = 'none';
-  document.getElementById('step-team').style.display = 'block';
-});
-
-// 비밀번호 모달
-function openPwModal(desc) {
-  document.getElementById('pw-modal-desc').textContent = desc;
-  document.getElementById('pw-input').value = '';
-  document.getElementById('pw-error').textContent = '';
-  document.getElementById('pw-modal').classList.add('show');
-  setTimeout(() => document.getElementById('pw-input').focus(), 150);
-}
-
-document.getElementById('pw-cancel-btn').addEventListener('click', () => {
-  document.getElementById('pw-modal').classList.remove('show');
-  pendingDeleteKey = null; pendingDeleteAll = false;
-});
-
-document.getElementById('pw-confirm-btn').addEventListener('click', async () => {
-  const val = document.getElementById('pw-input').value;
-  if (val !== PW) {
-    document.getElementById('pw-error').textContent = '비밀번호가 올바르지 않습니다';
-    document.getElementById('pw-input').value = '';
-    document.getElementById('pw-input').focus();
-    return;
-  }
-  document.getElementById('pw-modal').classList.remove('show');
-  try {
-    if (pendingToggle) {
-      const { set } = await import('https://www.gstatic.com/firebasejs/12.14.0/firebase-database.js');
-      await set(settingsRef, !isActive);
-    } else if (pendingDeleteAll) await remove(opinionsRef);
-    else if (pendingDeleteKey) await remove(ref(db, 'opinions/' + pendingDeleteKey));
-  } catch(e) { alert('처리 실패: ' + e.message); }
-  pendingDeleteKey = null; pendingDeleteAll = false; pendingToggle = false;
-});
-
-document.getElementById('pw-input').addEventListener('keydown', e => {
-  if (e.key === 'Enter') document.getElementById('pw-confirm-btn').click();
-});
-
-document.getElementById('clear-all-btn').addEventListener('click', () => {
-  pendingDeleteAll = true; pendingDeleteKey = null;
-  openPwModal('전체 삭제하려면 비밀번호를 입력하세요');
+  document.getElementById('step-form').style.display = 'block';
+  applyQuestion(currentQuestion);
+  updateSubmitBtn();
 });
 
 // 피드 이벤트 위임
 document.getElementById('feed').addEventListener('click', e => {
-  const delBtn = e.target.closest('[data-del-key]');
-  if (delBtn) {
-    pendingDeleteKey = delBtn.dataset.delKey; pendingDeleteAll = false;
-    openPwModal('의견을 삭제하려면 비밀번호를 입력하세요');
-    return;
-  }
   const heartBtn = e.target.closest('[data-heart-key]');
   if (heartBtn && !heartBtn.classList.contains('liked')) {
     pendingHeartKey = heartBtn.dataset.heartKey;
@@ -456,28 +437,32 @@ document.getElementById('heart-team-grid').addEventListener('click', async e => 
   pendingHeartKey = null;
 });
 
-// 필터
-document.getElementById('filter-row').addEventListener('click', e => {
+// 필터 (주제별)
+const FILTER_TOPICS = [
+  { key: 'all', label: '전체' },
+  { key: '응원메시지자랑', label: '응원메시지자랑' },
+  { key: '우리가꿈꾸는활동', label: '우리가꿈꾸는활동' },
+  { key: '재미있는활동아이디어', label: '재미있는활동아이디어' },
+  { key: '자유입력', label: '자유입력' },
+];
+
+function buildFilters() {
+  const row = document.getElementById('filter-row');
+  let html = '';
+  FILTER_TOPICS.forEach(ft => {
+    const cnt = ft.key === 'all' ? opinions.length : opinions.filter(o => (o.topic || '자유입력') === ft.key).length;
+    if (ft.key !== 'all' && cnt === 0) return;
+    html += `<span class="filter-chip ${currentFilter === ft.key ? 'active' : ''}" data-filter="${ft.key}">${ft.label} ${cnt}</span>`;
+  });
+  row.innerHTML = html;
+}
+
+document.querySelector('.filter-scroll').addEventListener('click', e => {
   const chip = e.target.closest('[data-filter]');
   if (!chip) return;
   currentFilter = chip.dataset.filter;
   renderFeed();
 });
-
-// 통계 서브탭
-document.getElementById('sub-opinion-btn').addEventListener('click', () => setStatTab('opinion'));
-document.getElementById('sub-heart-btn').addEventListener('click', () => setStatTab('heart'));
-document.getElementById('sub-participation-btn').addEventListener('click', () => setStatTab('participation'));
-document.getElementById('sub-ranking-btn').addEventListener('click', () => setStatTab('ranking'));
-
-function setStatTab(tab) {
-  currentStatTab = tab;
-  ['opinion','heart','participation','ranking'].forEach(t => {
-    const el = document.getElementById(`sub-${t}-btn`);
-    if (el) el.classList.toggle('active', t === tab);
-  });
-  renderStatDetail();
-}
 
 function escapeHtml(s) {
   return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
@@ -489,7 +474,10 @@ function heartCount(hearts) {
 
 function renderFeed() {
   const feed = document.getElementById('feed');
-  const filtered = currentFilter === 'all' ? opinions : opinions.filter(o => o.team === parseInt(currentFilter));
+  const filtered = currentFilter === 'all'
+    ? opinions
+    : opinions.filter(o => (o.topic || '자유입력') === currentFilter);
+
   if (filtered.length === 0) {
     feed.innerHTML = '<div class="empty-feed"><i class="ti ti-inbox"></i>아직 제출된 의견이 없습니다</div>';
   } else {
@@ -499,15 +487,16 @@ function renderFeed() {
       const t = new Date(op.time).toLocaleTimeString('ko-KR',{hour:'2-digit',minute:'2-digit'});
       const hCount = heartCount(op.hearts);
       const liked = likedMap[op.key] !== undefined;
+      const topicLabel = op.topic || '자유입력';
       return `<div class="opinion-card">
         <div class="card-meta">
-          <span class="team-tag ${color}">${TEAMS[op.team]}</span>
-          <div class="card-right">
-            <span class="card-time">${t}</span>
-            <button class="card-del" data-del-key="${op.key}" title="삭제"><i class="ti ti-x"></i></button>
+          <div class="card-meta-left">
+            <span class="team-tag ${color}">${TEAMS[op.team]}</span>
+            <span class="topic-tag">${escapeHtml(topicLabel)}</span>
           </div>
+          <span class="card-time">${t}</span>
         </div>
-        ${op.title ? `<div class="card-title-text">${escapeHtml(op.title)}</div>` : ''}
+        ${op.title && op.title !== topicLabel ? `<div class="card-title-text">${escapeHtml(op.title)}</div>` : ''}
         <div class="card-text">${escapeHtml(op.text)}</div>
         <div class="card-footer">
           <button class="heart-btn${liked?' liked':''}" data-heart-key="${op.key}">
@@ -520,21 +509,28 @@ function renderFeed() {
   buildFilters();
 }
 
-function buildFilters() {
-  const teams = [...new Set(opinions.map(o=>o.team))].sort((a,b)=>a-b);
-  let html = `<span class="filter-chip ${currentFilter==='all'?'active':''}" data-filter="all">전체 ${opinions.length}</span>`;
-  teams.forEach(t => {
-    const cnt = opinions.filter(o=>o.team===t).length;
-    html += `<span class="filter-chip ${currentFilter==t?'active':''}" data-filter="${t}">${TEAMS[t]} ${cnt}</span>`;
-  });
-  document.getElementById('filter-row').innerHTML = html;
-}
-
+// 참여현황
 function renderStats() {
   const totalH = opinions.reduce((sum, op) => sum + heartCount(op.hearts), 0);
+  const totalP = opinions.reduce((sum, op) => {
+    return sum + (op.hearts ? Object.values(op.hearts).filter(v => v === true).length : 0);
+  }, 0);
   document.getElementById('total-count').textContent = opinions.length;
   document.getElementById('total-hearts').textContent = totalH;
-  document.getElementById('total-participation').textContent = totalH;
+  document.getElementById('total-participation').textContent = totalP;
+  renderStatDetail();
+}
+
+document.getElementById('sub-opinion-btn').addEventListener('click', () => setStatTab('opinion'));
+document.getElementById('sub-heart-btn').addEventListener('click', () => setStatTab('heart'));
+document.getElementById('sub-participation-btn').addEventListener('click', () => setStatTab('participation'));
+document.getElementById('sub-ranking-btn').addEventListener('click', () => setStatTab('ranking'));
+
+function setStatTab(tab) {
+  currentStatTab = tab;
+  ['opinion','heart','participation','ranking'].forEach(t => {
+    document.getElementById(`sub-${t}-btn`).classList.toggle('active', t === tab);
+  });
   renderStatDetail();
 }
 
@@ -578,14 +574,10 @@ function renderStatDetail() {
     });
     const sorted = [...scores].sort((a,b) => b.score - a.score);
     const groups = [
-      sorted.slice(0,2),
-      sorted.slice(2,4),
-      sorted.slice(4,6),
-      sorted.slice(6,8),
-      sorted.slice(8,11),
+      sorted.slice(0,2), sorted.slice(2,4), sorted.slice(4,6), sorted.slice(6,8), sorted.slice(8,11)
     ];
     el.innerHTML = `
-      <div style="text-align:center;font-size:15px;font-weight:500;color:var(--color-text-primary);margin-bottom:1.2rem">🍦 아이스크림 먼저 골라볼게요!</div>
+      <div style="text-align:center;font-size:15px;font-weight:500;color:#111;margin-bottom:1.2rem">🍦 아이스크림 먼저 골라볼게요!</div>
       ${groups.map(group => `
         <div style="display:flex;gap:10px;justify-content:center;margin-bottom:12px;flex-wrap:wrap">
           ${group.map(({idx}) => `
@@ -596,6 +588,7 @@ function renderStatDetail() {
   }
 }
 
+// Firebase 리스너
 onValue(opinionsRef, snapshot => {
   setConnected(true);
   opinions = [];
@@ -603,49 +596,33 @@ onValue(opinionsRef, snapshot => {
     opinions.unshift({ key: child.key, ...child.val() });
   });
   renderFeed();
-  renderStats();
+  if (document.getElementById('view-stats').classList.contains('active')) renderStats();
+});
+
+onValue(activeRef, snapshot => {
+  const active = snapshot.val() !== false;
+  isActive = active;
+  const banner = document.getElementById('closed-banner');
+  const form = document.getElementById('step-form');
+  const done = document.getElementById('step-done');
+  if (active) {
+    banner.style.display = 'none';
+    if (done.style.display === 'none') form.style.display = 'block';
+  } else {
+    banner.style.display = 'block';
+    form.style.display = 'none';
+  }
+});
+
+onValue(questionRef, snapshot => {
+  const q = snapshot.val() || '자유입력';
+  applyQuestion(q);
 });
 
 renderFeed();
-
-function applyActiveState(active) {
-  isActive = active;
-  const banner = document.getElementById("closed-banner");
-  const stepTeam = document.getElementById("step-team");
-  const stepInput = document.getElementById("step-input");
-  const stepDone = document.getElementById("step-done");
-  const toggleBtn = document.getElementById("toggle-btn");
-  const toggleIcon = document.getElementById("toggle-icon");
-  const toggleLabel = document.getElementById("toggle-label");
-  if (active) {
-    banner.style.display = "none";
-    if (stepDone.style.display === "none" && stepInput.style.display === "none") stepTeam.style.display = "block";
-    toggleBtn.style.background = "#e8f5e9";
-    toggleBtn.style.borderColor = "#a5d6a7";
-    toggleBtn.style.color = "#2e7d32";
-    toggleIcon.className = "ti ti-player-play";
-    toggleLabel.textContent = "접수 중";
-  } else {
-    banner.style.display = "block";
-    stepTeam.style.display = "none";
-    stepInput.style.display = "none";
-    toggleBtn.style.background = "#fff3e0";
-    toggleBtn.style.borderColor = "#ffcc80";
-    toggleBtn.style.color = "#e65100";
-    toggleIcon.className = "ti ti-player-pause";
-    toggleLabel.textContent = "접수 중단";
-  }
-}
-
-onValue(settingsRef, snapshot => {
-  const active = snapshot.val() !== false;
-  applyActiveState(active);
-});
-
-document.getElementById("toggle-btn").addEventListener("click", () => {
-  pendingToggle = true;
-  openPwModal(isActive ? "접수를 중단하려면 비밀번호를 입력하세요" : "접수를 재개하려면 비밀번호를 입력하세요");
-});
 </script>
+<style>
+@keyframes spin{from{transform:rotate(0deg)}to{transform:rotate(360deg)}}
+</style>
 </body>
 </html>
