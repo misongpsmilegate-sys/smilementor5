@@ -41,11 +41,8 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;backgrou
 .success-icon{font-size:52px;color:#22c55e;margin-bottom:1rem}
 .success-wrap h2{font-size:20px;font-weight:600;margin-bottom:8px;color:#111}
 .success-wrap p{color:#666;font-size:14px;margin-bottom:2rem}
-.admin-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:1.5rem}
-.tab-row{display:flex;gap:6px}
-.tab-btn{padding:7px 16px;border-radius:8px;border:1.5px solid #dee2e6;background:transparent;cursor:pointer;font-size:13px;color:#666;font-weight:500}
-.tab-btn.active{background:#111;color:#fff;border-color:#111}
-.filter-row{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:1rem}
+.feed-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:1rem}
+.filter-row{display:flex;gap:6px;flex-wrap:wrap}
 .filter-chip{padding:5px 12px;border-radius:20px;border:1.5px solid #dee2e6;background:#f8f9fa;font-size:12px;color:#666;cursor:pointer;font-weight:500}
 .filter-chip.active{background:#111;color:#fff;border-color:#111}
 .feed{display:flex;flex-direction:column;gap:10px}
@@ -67,8 +64,6 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;backgrou
 .heart-btn.liked{background:#e8472a;color:#fff;border-color:#e8472a;cursor:default}
 .empty-feed{text-align:center;padding:3rem;color:#aaa;font-size:14px}
 .empty-feed i{font-size:36px;display:block;margin-bottom:10px}
-
-/* 통계 */
 .stats-top{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-bottom:1.2rem}
 .stat-card{padding:12px;border-radius:12px;background:#f8f9fa;border:1px solid #e9ecef;text-align:center}
 .stat-num{font-size:26px;font-weight:700;color:#111}
@@ -81,15 +76,12 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;backgrou
 .team-stat-bar-wrap{flex:1;height:8px;background:#e9ecef;border-radius:4px;overflow:hidden}
 .team-stat-bar{height:100%;border-radius:4px;transition:width 0.4s}
 .team-stat-count{font-size:12px;color:#888;width:30px;text-align:right}
-
-.bottom-nav{border-top:1px solid #f1f3f5;padding:12px 0 0;display:flex;gap:4px;justify-content:center;margin-top:2rem}
-.nav-item{padding:8px 20px;border-radius:10px;border:none;background:none;cursor:pointer;font-size:12px;color:#999;display:flex;flex-direction:column;align-items:center;gap:3px;font-weight:500}
+.bottom-nav{border-top:1px solid #f1f3f5;padding:10px 0 0;display:flex;justify-content:space-around;margin-top:2rem}
+.nav-item{flex:1;padding:8px 4px;border-radius:10px;border:none;background:none;cursor:pointer;font-size:11px;color:#999;display:flex;flex-direction:column;align-items:center;gap:3px;font-weight:500}
 .nav-item i{font-size:20px}
 .nav-item.active{color:#111;background:#f1f3f5}
-.clear-btn{font-size:12px;color:#ef4444;background:none;border:1px solid #fecaca;border-radius:6px;padding:4px 10px;cursor:pointer;white-space:nowrap}
+.clear-btn{font-size:12px;color:#ef4444;background:none;border:1px solid #fecaca;border-radius:6px;padding:4px 10px;cursor:pointer;white-space:nowrap;flex-shrink:0}
 .clear-btn:hover{background:#fff5f5}
-
-/* 모달 */
 .modal-overlay{display:none;position:fixed;top:0;left:0;right:0;bottom:0;background:rgba(0,0,0,0.5);z-index:999;align-items:center;justify-content:center}
 .modal-overlay.show{display:flex}
 .modal{background:#fff;border-radius:16px;padding:1.5rem;width:300px;text-align:center;box-shadow:0 8px 32px rgba(0,0,0,0.15)}
@@ -113,7 +105,7 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;backgrou
 <body>
 <div class="app" id="app">
 
-  <!-- 제출 뷰 -->
+  <!-- 의견 제출 뷰 -->
   <div class="view active" id="view-submit">
     <div class="logo">
       <span class="dot" id="conn-dot"></span>
@@ -122,7 +114,6 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;backgrou
     <div class="banner">
       <img src="banner.png" alt="스마일멘토 시즌5">
     </div>
-
     <div id="step-team">
       <div class="page-title">함께 나누고 싶은 의견을 작성해주세요!</div>
       <div class="page-sub">팀을 선택한 후 의견을 입력해주세요</div>
@@ -131,7 +122,6 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;backgrou
         <i class="ti ti-arrow-right"></i> 다음
       </button>
     </div>
-
     <div id="step-input" style="display:none">
       <div class="page-title">의견을 입력해주세요</div>
       <div class="page-sub" id="input-sub"></div>
@@ -147,7 +137,6 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;backgrou
         <button class="btn btn-primary" id="submit-btn" disabled><i class="ti ti-send"></i> 제출</button>
       </div>
     </div>
-
     <div id="step-done" style="display:none">
       <div class="success-wrap">
         <div class="success-icon"><i class="ti ti-circle-check"></i></div>
@@ -156,58 +145,55 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;backgrou
         <button class="btn btn-primary" id="reset-btn"><i class="ti ti-plus"></i> 추가 의견 제출</button>
       </div>
     </div>
-
     <div class="bottom-nav">
-      <button class="nav-item active" id="nav-submit-btn"><i class="ti ti-message-plus"></i><span>의견 제출</span></button>
-      <button class="nav-item" id="nav-admin-btn"><i class="ti ti-layout-dashboard"></i><span>대시보드</span></button>
+      <button class="nav-item active" data-nav="submit"><i class="ti ti-pencil"></i><span>의견 제출</span></button>
+      <button class="nav-item" data-nav="feed"><i class="ti ti-messages"></i><span>의견 살펴보기</span></button>
+      <button class="nav-item" data-nav="stats"><i class="ti ti-chart-bar"></i><span>참여현황</span></button>
     </div>
   </div>
 
-  <!-- 대시보드 뷰 -->
-  <div class="view" id="view-admin">
-    <div class="admin-header">
-      <div class="page-title">진행자 대시보드</div>
-      <div class="tab-row">
-        <button class="tab-btn active" id="tab-feed-btn">피드</button>
-        <button class="tab-btn" id="tab-stats-btn">통계</button>
-      </div>
+  <!-- 의견 살펴보기 뷰 -->
+  <div class="view" id="view-feed">
+    <div class="feed-header">
+      <div class="page-title" style="margin-bottom:0">의견 살펴보기</div>
+      <button class="clear-btn" id="clear-all-btn">전체 삭제</button>
     </div>
-
-    <div id="tab-feed">
-      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:8px">
-        <div class="filter-row" id="filter-row" style="margin-bottom:0;flex:1"></div>
-        <button class="clear-btn" id="clear-all-btn">전체 삭제</button>
-      </div>
-      <div style="height:8px"></div>
-      <div class="feed" id="feed"></div>
-    </div>
-
-    <div id="tab-stats" style="display:none">
-      <div class="stats-top">
-        <div class="stat-card">
-          <div class="stat-num" id="total-count">0</div>
-          <div class="stat-label">전체 의견 수</div>
-        </div>
-        <div class="stat-card">
-          <div class="stat-num" id="total-hearts">0</div>
-          <div class="stat-label">전체 하트 수</div>
-        </div>
-        <div class="stat-card">
-          <div class="stat-num" id="total-participation">0</div>
-          <div class="stat-label">전체 참여 수</div>
-        </div>
-      </div>
-      <div class="stat-sub-tabs">
-        <button class="stat-sub-btn active" id="sub-opinion-btn">팀별 의견 참여 현황</button>
-        <button class="stat-sub-btn" id="sub-heart-btn">팀별 하트 현황</button>
-        <button class="stat-sub-btn" id="sub-participation-btn">팀별 참여 현황</button>
-      </div>
-      <div id="stat-detail"></div>
-    </div>
-
+    <div class="filter-row" id="filter-row" style="margin-bottom:10px"></div>
+    <div class="feed" id="feed"></div>
     <div class="bottom-nav">
-      <button class="nav-item" id="nav-submit-btn2"><i class="ti ti-message-plus"></i><span>의견 제출</span></button>
-      <button class="nav-item active" id="nav-admin-btn2"><i class="ti ti-layout-dashboard"></i><span>대시보드</span></button>
+      <button class="nav-item" data-nav="submit"><i class="ti ti-pencil"></i><span>의견 제출</span></button>
+      <button class="nav-item active" data-nav="feed"><i class="ti ti-messages"></i><span>의견 살펴보기</span></button>
+      <button class="nav-item" data-nav="stats"><i class="ti ti-chart-bar"></i><span>참여현황</span></button>
+    </div>
+  </div>
+
+  <!-- 참여현황 뷰 -->
+  <div class="view" id="view-stats">
+    <div class="page-title" style="margin-bottom:1rem">참여현황</div>
+    <div class="stats-top">
+      <div class="stat-card">
+        <div class="stat-num" id="total-count">0</div>
+        <div class="stat-label">전체 의견 수</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-num" id="total-hearts">0</div>
+        <div class="stat-label">전체 하트 수</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-num" id="total-participation">0</div>
+        <div class="stat-label">전체 참여 수</div>
+      </div>
+    </div>
+    <div class="stat-sub-tabs">
+      <button class="stat-sub-btn active" id="sub-opinion-btn">팀별 의견 참여</button>
+      <button class="stat-sub-btn" id="sub-heart-btn">팀별 하트 현황</button>
+      <button class="stat-sub-btn" id="sub-participation-btn">팀별 참여 현황</button>
+    </div>
+    <div id="stat-detail"></div>
+    <div class="bottom-nav">
+      <button class="nav-item" data-nav="submit"><i class="ti ti-pencil"></i><span>의견 제출</span></button>
+      <button class="nav-item" data-nav="feed"><i class="ti ti-messages"></i><span>의견 살펴보기</span></button>
+      <button class="nav-item active" data-nav="stats"><i class="ti ti-chart-bar"></i><span>참여현황</span></button>
     </div>
   </div>
 </div>
@@ -259,17 +245,12 @@ const TEAM_COLOR = i => i < 4 ? 'blue' : 'red';
 const BAR_COLOR = i => i < 4 ? '#1a87c8' : '#e8472a';
 const PW = '930522';
 
-// localStorage: 기기당 하트 기록 { opinionKey: teamIdx }
 function getLikedMap() {
   try { return JSON.parse(localStorage.getItem('sm5_liked') || '{}'); } catch { return {}; }
 }
 function setLiked(opinionKey, teamIdx) {
-  const m = getLikedMap();
-  m[opinionKey] = teamIdx;
+  const m = getLikedMap(); m[opinionKey] = teamIdx;
   localStorage.setItem('sm5_liked', JSON.stringify(m));
-}
-function isLiked(opinionKey) {
-  return getLikedMap()[opinionKey] !== undefined;
 }
 
 let opinions = [];
@@ -285,6 +266,17 @@ function setConnected(ok) {
   document.getElementById('conn-dot').className = 'dot' + (ok ? ' connected' : '');
   document.getElementById('conn-label').textContent = ok ? 'Firebase 연결됨' : '연결 중...';
 }
+
+// 네비게이션
+function switchView(name) {
+  document.querySelectorAll('.view').forEach(v => v.classList.remove('active'));
+  document.getElementById('view-' + name).classList.add('active');
+  if (name === 'stats') renderStats();
+}
+
+document.querySelectorAll('[data-nav]').forEach(btn => {
+  btn.addEventListener('click', () => switchView(btn.dataset.nav));
+});
 
 // 팀 버튼
 const grid = document.getElementById('team-grid');
@@ -342,8 +334,7 @@ document.getElementById('submit-btn').addEventListener('click', async () => {
   const text = document.getElementById('opinion-text').value.trim();
   if (!title || !text || selectedTeam === null) return;
   const btn = document.getElementById('submit-btn');
-  btn.disabled = true;
-  btn.innerHTML = '전송 중...';
+  btn.disabled = true; btn.innerHTML = '전송 중...';
   try {
     await push(opinionsRef, { team: selectedTeam, title, text, time: Date.now(), hearts: {} });
     document.getElementById('step-input').style.display = 'none';
@@ -355,8 +346,7 @@ document.getElementById('submit-btn').addEventListener('click', async () => {
     document.getElementById('char-num').textContent = '0';
   } catch(e) {
     alert('전송 실패: ' + e.message);
-    btn.disabled = false;
-    btn.innerHTML = '<i class="ti ti-send"></i> 제출';
+    btn.disabled = false; btn.innerHTML = '<i class="ti ti-send"></i> 제출';
   }
 });
 
@@ -367,44 +357,6 @@ document.getElementById('reset-btn').addEventListener('click', () => {
   document.getElementById('step-done').style.display = 'none';
   document.getElementById('step-team').style.display = 'block';
 });
-
-// 네비게이션
-document.getElementById('nav-admin-btn').addEventListener('click', () => {
-  document.getElementById('view-submit').classList.remove('active');
-  document.getElementById('view-admin').classList.add('active');
-});
-document.getElementById('nav-submit-btn2').addEventListener('click', () => {
-  document.getElementById('view-admin').classList.remove('active');
-  document.getElementById('view-submit').classList.add('active');
-});
-
-// 탭
-document.getElementById('tab-feed-btn').addEventListener('click', () => {
-  document.getElementById('tab-feed-btn').classList.add('active');
-  document.getElementById('tab-stats-btn').classList.remove('active');
-  document.getElementById('tab-feed').style.display = 'block';
-  document.getElementById('tab-stats').style.display = 'none';
-});
-document.getElementById('tab-stats-btn').addEventListener('click', () => {
-  document.getElementById('tab-stats-btn').classList.add('active');
-  document.getElementById('tab-feed-btn').classList.remove('active');
-  document.getElementById('tab-stats').style.display = 'block';
-  document.getElementById('tab-feed').style.display = 'none';
-  renderStats();
-});
-
-// 통계 서브탭
-document.getElementById('sub-opinion-btn').addEventListener('click', () => setStatTab('opinion'));
-document.getElementById('sub-heart-btn').addEventListener('click', () => setStatTab('heart'));
-document.getElementById('sub-participation-btn').addEventListener('click', () => setStatTab('participation'));
-
-function setStatTab(tab) {
-  currentStatTab = tab;
-  ['opinion','heart','participation'].forEach(t => {
-    document.getElementById(`sub-${t}-btn`).classList.toggle('active', t === tab);
-  });
-  renderStatDetail();
-}
 
 // 비밀번호 모달
 function openPwModal(desc) {
@@ -417,8 +369,7 @@ function openPwModal(desc) {
 
 document.getElementById('pw-cancel-btn').addEventListener('click', () => {
   document.getElementById('pw-modal').classList.remove('show');
-  pendingDeleteKey = null;
-  pendingDeleteAll = false;
+  pendingDeleteKey = null; pendingDeleteAll = false;
 });
 
 document.getElementById('pw-confirm-btn').addEventListener('click', async () => {
@@ -434,8 +385,7 @@ document.getElementById('pw-confirm-btn').addEventListener('click', async () => 
     if (pendingDeleteAll) await remove(opinionsRef);
     else if (pendingDeleteKey) await remove(ref(db, 'opinions/' + pendingDeleteKey));
   } catch(e) { alert('삭제 실패: ' + e.message); }
-  pendingDeleteKey = null;
-  pendingDeleteAll = false;
+  pendingDeleteKey = null; pendingDeleteAll = false;
 });
 
 document.getElementById('pw-input').addEventListener('keydown', e => {
@@ -451,8 +401,7 @@ document.getElementById('clear-all-btn').addEventListener('click', () => {
 document.getElementById('feed').addEventListener('click', e => {
   const delBtn = e.target.closest('[data-del-key]');
   if (delBtn) {
-    pendingDeleteKey = delBtn.dataset.delKey;
-    pendingDeleteAll = false;
+    pendingDeleteKey = delBtn.dataset.delKey; pendingDeleteAll = false;
     openPwModal('의견을 삭제하려면 비밀번호를 입력하세요');
     return;
   }
@@ -465,10 +414,8 @@ document.getElementById('feed').addEventListener('click', e => {
 
 // 하트 모달
 function openHeartModal() {
+  document.querySelectorAll('.heart-team-btn').forEach(b => b.disabled = false);
   document.getElementById('heart-modal').classList.add('show');
-  document.querySelectorAll('.heart-team-btn').forEach(b => {
-    b.disabled = false;
-  });
 }
 
 document.getElementById('heart-cancel-btn').addEventListener('click', () => {
@@ -485,13 +432,12 @@ document.getElementById('heart-team-grid').addEventListener('click', async e => 
   try {
     const heartRef = ref(db, `opinions/${pendingHeartKey}/hearts/${teamIdx}`);
     await runTransaction(heartRef, current => {
-      if (current !== null) return; // 이미 있으면 중단
+      if (current !== null) return;
       return true;
     });
     setLiked(pendingHeartKey, teamIdx);
-  } catch(e) {
-    alert('하트 처리 실패: ' + e.message);
-  }
+    renderFeed();
+  } catch(e) { alert('하트 처리 실패: ' + e.message); }
   pendingHeartKey = null;
 });
 
@@ -503,10 +449,22 @@ document.getElementById('filter-row').addEventListener('click', e => {
   renderFeed();
 });
 
+// 통계 서브탭
+document.getElementById('sub-opinion-btn').addEventListener('click', () => setStatTab('opinion'));
+document.getElementById('sub-heart-btn').addEventListener('click', () => setStatTab('heart'));
+document.getElementById('sub-participation-btn').addEventListener('click', () => setStatTab('participation'));
+
+function setStatTab(tab) {
+  currentStatTab = tab;
+  ['opinion','heart','participation'].forEach(t => {
+    document.getElementById(`sub-${t}-btn`).classList.toggle('active', t === tab);
+  });
+  renderStatDetail();
+}
+
 function escapeHtml(s) {
   return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
 }
-
 function heartCount(hearts) {
   if (!hearts) return 0;
   return Object.values(hearts).filter(v => v === true).length;
@@ -557,19 +515,15 @@ function buildFilters() {
 
 function renderStats() {
   const totalH = opinions.reduce((sum, op) => sum + heartCount(op.hearts), 0);
-  // 전체 참여 수: 하트를 누른 횟수 (hearts 객체의 true 값 총합)
-  const totalPart = totalH;
   document.getElementById('total-count').textContent = opinions.length;
   document.getElementById('total-hearts').textContent = totalH;
-  document.getElementById('total-participation').textContent = totalPart;
+  document.getElementById('total-participation').textContent = totalH;
   renderStatDetail();
 }
 
 function renderStatDetail() {
   const el = document.getElementById('stat-detail');
-
   if (currentStatTab === 'opinion') {
-    // 팀별 의견 작성 수
     const counts = TEAMS.map((_,i) => opinions.filter(o=>o.team===i).length);
     const max = Math.max(...counts, 1);
     el.innerHTML = TEAMS.map((t,i) => `
@@ -578,9 +532,7 @@ function renderStatDetail() {
         <div class="team-stat-bar-wrap"><div class="team-stat-bar" style="width:${Math.round(counts[i]/max*100)}%;background:${BAR_COLOR(i)}"></div></div>
         <span class="team-stat-count">${counts[i]}</span>
       </div>`).join('');
-
   } else if (currentStatTab === 'heart') {
-    // 팀별 받은 하트 수 (게시글 팀 기준)
     const counts = TEAMS.map((_,i) => opinions.filter(o=>o.team===i).reduce((s,op)=>s+heartCount(op.hearts),0));
     const max = Math.max(...counts, 1);
     el.innerHTML = TEAMS.map((t,i) => `
@@ -589,9 +541,7 @@ function renderStatDetail() {
         <div class="team-stat-bar-wrap"><div class="team-stat-bar" style="width:${Math.round(counts[i]/max*100)}%;background:${BAR_COLOR(i)}"></div></div>
         <span class="team-stat-count">❤️${counts[i]}</span>
       </div>`).join('');
-
   } else if (currentStatTab === 'participation') {
-    // 팀별 참여 수: 해당 팀이 하트를 누른 횟수
     const counts = TEAMS.map((_,i) =>
       opinions.reduce((sum, op) => sum + (op.hearts && op.hearts[i] === true ? 1 : 0), 0)
     );
