@@ -1,0 +1,363 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>실시간 의견 수집</title>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@3.19.0/dist/tabler-icons.min.css">
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;background:#f8f9fa;min-height:100vh}
+.app{max-width:480px;margin:0 auto;padding:1.5rem;min-height:100vh;background:#fff}
+.view{display:none}.view.active{display:block}
+.logo{font-size:13px;color:#888;margin-bottom:1.5rem;display:flex;align-items:center;gap:6px}
+.dot{width:8px;height:8px;border-radius:50%;background:#ccc;display:inline-block;flex-shrink:0}
+.dot.connected{background:#22c55e}
+.page-title{font-size:22px;font-weight:600;color:#111;margin-bottom:6px}
+.page-sub{font-size:15px;color:#666;margin-bottom:1.5rem}
+.btn{display:inline-flex;align-items:center;gap:6px;padding:12px 20px;border-radius:10px;border:none;cursor:pointer;font-size:15px;font-weight:500;transition:opacity 0.15s;text-align:center;justify-content:center}
+.btn:hover{opacity:0.85}
+.btn:disabled{opacity:0.4;cursor:not-allowed}
+.btn-primary{background:#111;color:#fff}
+.btn-secondary{background:#f1f3f5;color:#111;border:1px solid #ddd}
+.btn-sm{padding:8px 14px;font-size:13px}
+.team-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-bottom:1.5rem}
+.team-btn{padding:16px 8px;border-radius:12px;border:2px solid #e9ecef;background:#f8f9fa;cursor:pointer;font-size:14px;font-weight:500;color:#333;text-align:center;transition:all 0.15s}
+.team-btn:hover{border-color:#adb5bd}
+.team-btn.selected{border-color:#111;background:#111;color:#fff}
+.input-area{width:100%;min-height:120px;padding:14px;border-radius:10px;border:1.5px solid #dee2e6;background:#fff;color:#111;font-size:15px;font-family:inherit;resize:vertical;outline:none;line-height:1.6}
+.input-area:focus{border-color:#666}
+.char-count{font-size:12px;color:#aaa;text-align:right;margin-top:4px;margin-bottom:1rem}
+.submit-row{display:flex;align-items:center;justify-content:space-between}
+.success-wrap{text-align:center;padding:3rem 1rem}
+.success-icon{font-size:52px;color:#22c55e;margin-bottom:1rem}
+.success-wrap h2{font-size:20px;font-weight:600;margin-bottom:8px;color:#111}
+.success-wrap p{color:#666;font-size:14px;margin-bottom:2rem}
+.admin-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:1.5rem}
+.tab-row{display:flex;gap:6px}
+.tab-btn{padding:7px 16px;border-radius:8px;border:1.5px solid #dee2e6;background:transparent;cursor:pointer;font-size:13px;color:#666;font-weight:500}
+.tab-btn.active{background:#111;color:#fff;border-color:#111}
+.filter-row{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:1rem}
+.filter-chip{padding:5px 12px;border-radius:20px;border:1.5px solid #dee2e6;background:#f8f9fa;font-size:12px;color:#666;cursor:pointer;transition:all 0.12s;font-weight:500}
+.filter-chip.active{background:#111;color:#fff;border-color:#111}
+.feed{display:flex;flex-direction:column;gap:10px}
+.opinion-card{padding:14px 16px;border-radius:12px;background:#f8f9fa;border:1px solid #e9ecef;animation:slideIn 0.3s ease}
+@keyframes slideIn{from{opacity:0;transform:translateY(-6px)}to{opacity:1;transform:translateY(0)}}
+.card-meta{display:flex;align-items:center;justify-content:space-between;margin-bottom:8px}
+.team-tag{font-size:12px;font-weight:600;padding:3px 9px;border-radius:5px}
+.card-right{display:flex;align-items:center;gap:8px}
+.card-time{font-size:11px;color:#aaa}
+.card-del{border:none;background:none;cursor:pointer;color:#ccc;font-size:16px;padding:2px 4px;border-radius:4px;line-height:1}
+.card-del:hover{color:#ef4444}
+.card-text{font-size:14px;color:#222;line-height:1.7}
+.empty-feed{text-align:center;padding:3rem;color:#aaa;font-size:14px}
+.empty-feed i{font-size:36px;display:block;margin-bottom:10px}
+.stats-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:10px;margin-bottom:1.5rem}
+.stat-card{padding:16px;border-radius:12px;background:#f8f9fa;border:1px solid #e9ecef}
+.stat-num{font-size:32px;font-weight:700;color:#111}
+.stat-label{font-size:12px;color:#888;margin-top:2px}
+.team-stat-row{display:flex;align-items:center;gap:10px;margin-bottom:10px}
+.team-stat-name{font-size:13px;color:#333;width:50px;flex-shrink:0;font-weight:500}
+.team-stat-bar-wrap{flex:1;height:8px;background:#e9ecef;border-radius:4px;overflow:hidden}
+.team-stat-bar{height:100%;border-radius:4px;transition:width 0.4s}
+.team-stat-count{font-size:12px;color:#888;width:20px;text-align:right}
+.bottom-nav{border-top:1px solid #f1f3f5;padding:12px 0 0;display:flex;gap:4px;justify-content:center;margin-top:2rem}
+.nav-item{padding:8px 20px;border-radius:10px;border:none;background:none;cursor:pointer;font-size:12px;color:#999;display:flex;flex-direction:column;align-items:center;gap:3px;font-weight:500}
+.nav-item i{font-size:20px}
+.nav-item.active{color:#111;background:#f1f3f5}
+.clear-btn{font-size:12px;color:#ef4444;background:none;border:1px solid #fecaca;border-radius:6px;padding:4px 10px;cursor:pointer}
+.clear-btn:hover{background:#fff5f5}
+</style>
+</head>
+<body>
+<div class="app" id="app">
+
+  <div class="view active" id="view-submit">
+    <div class="logo">
+      <span class="dot" id="conn-dot"></span>
+      <span id="conn-label">연결 중...</span>
+    </div>
+
+    <div id="step-team">
+      <div class="page-title">우리 팀을 선택하세요</div>
+      <div class="page-sub">팀을 선택한 후 의견을 입력해주세요</div>
+      <div class="team-grid" id="team-grid"></div>
+      <button class="btn btn-primary" style="width:100%" onclick="goToInput()" id="next-btn" disabled>
+        <i class="ti ti-arrow-right"></i> 다음
+      </button>
+    </div>
+
+    <div id="step-input" style="display:none">
+      <div class="page-title">의견을 입력해주세요</div>
+      <div class="page-sub" id="input-sub"></div>
+      <textarea class="input-area" id="opinion-text" placeholder="자유롭게 의견을 작성해주세요..." maxlength="300" oninput="updateChar()"></textarea>
+      <div class="char-count"><span id="char-num">0</span> / 300</div>
+      <div class="submit-row">
+        <button class="btn btn-secondary btn-sm" onclick="backToTeam()">
+          <i class="ti ti-arrow-left"></i> 팀 변경
+        </button>
+        <button class="btn btn-primary" id="submit-btn" onclick="submitOpinion()" disabled>
+          <i class="ti ti-send"></i> 제출
+        </button>
+      </div>
+    </div>
+
+    <div id="step-done" style="display:none">
+      <div class="success-wrap">
+        <div class="success-icon"><i class="ti ti-circle-check"></i></div>
+        <h2>의견이 제출되었습니다</h2>
+        <p id="done-sub"></p>
+        <button class="btn btn-primary" onclick="resetForm()">
+          <i class="ti ti-plus"></i> 추가 의견 제출
+        </button>
+      </div>
+    </div>
+
+    <div class="bottom-nav">
+      <button class="nav-item active" onclick="switchView('submit',this)">
+        <i class="ti ti-message-plus"></i><span>의견 제출</span>
+      </button>
+      <button class="nav-item" onclick="switchView('admin',this)">
+        <i class="ti ti-layout-dashboard"></i><span>대시보드</span>
+      </button>
+    </div>
+  </div>
+
+  <div class="view" id="view-admin">
+    <div class="admin-header">
+      <div class="page-title">진행자 대시보드</div>
+      <div class="tab-row">
+        <button class="tab-btn active" onclick="switchTab('feed',this)">피드</button>
+        <button class="tab-btn" onclick="switchTab('stats',this)">통계</button>
+      </div>
+    </div>
+
+    <div id="tab-feed">
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:8px">
+        <div class="filter-row" id="filter-row" style="margin-bottom:0;flex:1"></div>
+        <button class="clear-btn" onclick="clearAll()">전체 삭제</button>
+      </div>
+      <div style="height:8px"></div>
+      <div class="feed" id="feed"></div>
+    </div>
+
+    <div id="tab-stats" style="display:none">
+      <div class="stats-grid">
+        <div class="stat-card">
+          <div class="stat-num" id="total-count">0</div>
+          <div class="stat-label">전체 의견 수</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-num" id="active-teams">0</div>
+          <div class="stat-label">참여 팀 수</div>
+        </div>
+      </div>
+      <div id="team-stats"></div>
+    </div>
+
+    <div class="bottom-nav">
+      <button class="nav-item" onclick="switchView('submit',this)">
+        <i class="ti ti-message-plus"></i><span>의견 제출</span>
+      </button>
+      <button class="nav-item active" onclick="switchView('admin',this)">
+        <i class="ti ti-layout-dashboard"></i><span>대시보드</span>
+      </button>
+    </div>
+  </div>
+
+</div>
+
+<script type="module">
+import { initializeApp } from "https://www.gstatic.com/firebasejs/12.14.0/firebase-app.js";
+import { getDatabase, ref, push, onValue, remove } from "https://www.gstatic.com/firebasejs/12.14.0/firebase-database.js";
+
+const firebaseConfig = {
+  apiKey: "AIzaSyD6TOv4ro8LGNDUfrmeXz5YOf6CYc7dbR0",
+  authDomain: "smilementor5.firebaseapp.com",
+  databaseURL: "https://smilementor5-default-rtdb.firebaseio.com/",
+  projectId: "smilementor5",
+  storageBucket: "smilementor5.firebasestorage.app",
+  messagingSenderId: "549089219419",
+  appId: "1:549089219419:web:152ed19b16dfd6cbb3407e"
+};
+
+const fbApp = initializeApp(firebaseConfig);
+const db = getDatabase(fbApp);
+const opinionsRef = ref(db, 'opinions');
+
+const TEAMS = ['1팀','2팀','3팀','4팀','5팀','6팀','7팀','8팀','9팀','10팀','11팀'];
+const COLORS = [
+  {bg:'#EEF2FF',text:'#3730A3'},{bg:'#FDF4FF',text:'#7E22CE'},{bg:'#FFF1F2',text:'#9F1239'},
+  {bg:'#FFF7ED',text:'#9A3412'},{bg:'#FEFCE8',text:'#854D0E'},{bg:'#F0FDF4',text:'#14532D'},
+  {bg:'#F0FDFA',text:'#134E4A'},{bg:'#EFF6FF',text:'#1E3A8A'},{bg:'#FDF2F8',text:'#831843'},
+  {bg:'#F7FEE7',text:'#365314'},{bg:'#FFF8F0',text:'#7C3A00'}
+];
+
+let opinions = [];
+let selectedTeam = null;
+let currentFilter = 'all';
+
+function setConnected(ok) {
+  document.getElementById('conn-dot').className = 'dot' + (ok ? ' connected' : '');
+  document.getElementById('conn-label').textContent = ok ? 'Firebase 연결됨' : '연결 중...';
+}
+
+function buildTeamGrid() {
+  const grid = document.getElementById('team-grid');
+  TEAMS.forEach((t, i) => {
+    const b = document.createElement('button');
+    b.className = 'team-btn';
+    b.textContent = t;
+    b.onclick = () => {
+      document.querySelectorAll('.team-btn').forEach(x => x.classList.remove('selected'));
+      b.classList.add('selected');
+      selectedTeam = i;
+      document.getElementById('next-btn').disabled = false;
+    };
+    grid.appendChild(b);
+  });
+}
+
+window.goToInput = () => {
+  if (selectedTeam === null) return;
+  document.getElementById('step-team').style.display = 'none';
+  document.getElementById('step-input').style.display = 'block';
+  document.getElementById('input-sub').innerHTML = `<strong>${TEAMS[selectedTeam]}</strong>의 의견을 작성해주세요`;
+  document.getElementById('opinion-text').focus();
+};
+
+window.backToTeam = () => {
+  document.getElementById('step-input').style.display = 'none';
+  document.getElementById('step-team').style.display = 'block';
+};
+
+window.updateChar = () => {
+  const v = document.getElementById('opinion-text').value;
+  document.getElementById('char-num').textContent = v.length;
+  document.getElementById('submit-btn').disabled = v.trim().length === 0;
+};
+
+window.submitOpinion = async () => {
+  const text = document.getElementById('opinion-text').value.trim();
+  if (!text || selectedTeam === null) return;
+  const btn = document.getElementById('submit-btn');
+  btn.disabled = true;
+  btn.textContent = '전송 중...';
+  try {
+    await push(opinionsRef, { team: selectedTeam, text, time: Date.now() });
+    document.getElementById('step-input').style.display = 'none';
+    document.getElementById('step-done').style.display = 'block';
+    document.getElementById('done-sub').textContent = `${TEAMS[selectedTeam]} 의견이 전송되었습니다`;
+    document.getElementById('opinion-text').value = '';
+    document.getElementById('char-num').textContent = '0';
+  } catch(e) {
+    alert('전송 실패: ' + e.message);
+  }
+  btn.disabled = false;
+  btn.innerHTML = '<i class="ti ti-send"></i> 제출';
+};
+
+window.resetForm = () => {
+  selectedTeam = null;
+  document.querySelectorAll('.team-btn').forEach(b => b.classList.remove('selected'));
+  document.getElementById('next-btn').disabled = true;
+  document.getElementById('step-done').style.display = 'none';
+  document.getElementById('step-team').style.display = 'block';
+};
+
+window.deleteOp = async (key) => {
+  await remove(ref(db, 'opinions/' + key));
+};
+
+window.clearAll = async () => {
+  if (!confirm('모든 의견을 삭제할까요?')) return;
+  await remove(opinionsRef);
+};
+
+function escapeHtml(s) {
+  return s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+}
+
+function renderFeed() {
+  const feed = document.getElementById('feed');
+  const filtered = currentFilter === 'all' ? opinions : opinions.filter(o => o.team === parseInt(currentFilter));
+  if (filtered.length === 0) {
+    feed.innerHTML = '<div class="empty-feed"><i class="ti ti-inbox"></i>아직 제출된 의견이 없습니다</div>';
+  } else {
+    feed.innerHTML = filtered.map(op => {
+      const c = COLORS[op.team];
+      const t = new Date(op.time).toLocaleTimeString('ko-KR',{hour:'2-digit',minute:'2-digit'});
+      return `<div class="opinion-card">
+        <div class="card-meta">
+          <span class="team-tag" style="background:${c.bg};color:${c.text}">${TEAMS[op.team]}</span>
+          <div class="card-right">
+            <span class="card-time">${t}</span>
+            <button class="card-del" onclick="deleteOp('${op.key}')" title="삭제"><i class="ti ti-x"></i></button>
+          </div>
+        </div>
+        <div class="card-text">${escapeHtml(op.text)}</div>
+      </div>`;
+    }).join('');
+  }
+  buildFilters();
+  renderStats();
+}
+
+function buildFilters() {
+  const teams = [...new Set(opinions.map(o=>o.team))].sort((a,b)=>a-b);
+  let html = `<span class="filter-chip ${currentFilter==='all'?'active':''}" onclick="setFilter('all',this)">전체 ${opinions.length}</span>`;
+  teams.forEach(t => {
+    const cnt = opinions.filter(o=>o.team===t).length;
+    html += `<span class="filter-chip ${currentFilter==t?'active':''}" onclick="setFilter(${t},this)">${TEAMS[t]} ${cnt}</span>`;
+  });
+  document.getElementById('filter-row').innerHTML = html;
+}
+
+function renderStats() {
+  document.getElementById('total-count').textContent = opinions.length;
+  document.getElementById('active-teams').textContent = new Set(opinions.map(o=>o.team)).size;
+  const max = Math.max(...TEAMS.map((_,i)=>opinions.filter(o=>o.team===i).length), 1);
+  document.getElementById('team-stats').innerHTML = TEAMS.map((t,i)=>{
+    const cnt = opinions.filter(o=>o.team===i).length;
+    const c = COLORS[i];
+    return `<div class="team-stat-row">
+      <span class="team-stat-name">${t}</span>
+      <div class="team-stat-bar-wrap"><div class="team-stat-bar" style="width:${Math.round(cnt/max*100)}%;background:${c.text}"></div></div>
+      <span class="team-stat-count">${cnt}</span>
+    </div>`;
+  }).join('');
+}
+
+window.setFilter = (val) => {
+  currentFilter = val;
+  renderFeed();
+};
+
+window.switchTab = (tab, el) => {
+  document.querySelectorAll('.tab-btn').forEach(b=>b.classList.remove('active'));
+  el.classList.add('active');
+  document.getElementById('tab-feed').style.display = tab==='feed'?'block':'none';
+  document.getElementById('tab-stats').style.display = tab==='stats'?'block':'none';
+};
+
+window.switchView = (view, el) => {
+  document.querySelectorAll('.nav-item').forEach(b=>b.classList.remove('active'));
+  el.classList.add('active');
+  document.querySelectorAll('.view').forEach(v=>v.classList.remove('active'));
+  document.getElementById('view-'+view).classList.add('active');
+};
+
+onValue(opinionsRef, (snapshot) => {
+  setConnected(true);
+  opinions = [];
+  snapshot.forEach(child => {
+    opinions.unshift({ key: child.key, ...child.val() });
+  });
+  renderFeed();
+});
+
+buildTeamGrid();
+renderFeed();
+</script>
+</body>
+</html>
