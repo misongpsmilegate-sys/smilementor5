@@ -3,17 +3,19 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>실시간 의견 수집</title>
+<title>스마일멘토 시즌5</title>
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@3.19.0/dist/tabler-icons.min.css">
 <style>
 *{box-sizing:border-box;margin:0;padding:0}
 body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;background:#f8f9fa;min-height:100vh}
 .app{max-width:480px;margin:0 auto;padding:1.5rem;min-height:100vh;background:#fff;position:relative}
 .view{display:none}.view.active{display:block}
-.logo{font-size:13px;color:#888;margin-bottom:1.5rem;display:flex;align-items:center;gap:6px}
+.logo{font-size:13px;color:#888;margin-bottom:1.2rem;display:flex;align-items:center;gap:6px}
 .dot{width:8px;height:8px;border-radius:50%;background:#ccc;display:inline-block;flex-shrink:0}
 .dot.connected{background:#22c55e}
-.page-title{font-size:22px;font-weight:600;color:#111;margin-bottom:6px}
+.banner{width:100%;border-radius:12px;overflow:hidden;margin-bottom:1.2rem}
+.banner img{width:100%;display:block}
+.page-title{font-size:20px;font-weight:600;color:#111;margin-bottom:6px}
 .page-sub{font-size:15px;color:#666;margin-bottom:1.5rem}
 .btn{display:inline-flex;align-items:center;gap:6px;padding:12px 20px;border-radius:10px;border:none;cursor:pointer;font-size:15px;font-weight:500;transition:opacity 0.15s;justify-content:center}
 .btn:hover{opacity:0.85}
@@ -58,7 +60,15 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;backgrou
 .card-del{border:none;background:none;cursor:pointer;color:#ccc;font-size:16px;padding:2px 4px;border-radius:4px}
 .card-del:hover{color:#ef4444}
 .card-title-text{font-size:14px;font-weight:600;color:#111;margin-bottom:4px}
-.card-text{font-size:14px;color:#444;line-height:1.7}
+.card-text{font-size:14px;color:#444;line-height:1.7;margin-bottom:10px}
+.card-footer{display:flex;align-items:center;justify-content:space-between;margin-top:6px}
+.heart-btn{display:inline-flex;align-items:center;gap:5px;padding:5px 12px;border-radius:20px;border:1.5px solid #fecdd3;background:#fff5f5;cursor:pointer;font-size:13px;color:#e8472a;font-weight:500;transition:all 0.15s}
+.heart-btn:hover{background:#ffe4e6}
+.heart-btn.liked{background:#e8472a;color:#fff;border-color:#e8472a}
+.heart-teams{display:flex;gap:4px;flex-wrap:wrap;margin-top:6px}
+.heart-team-chip{font-size:11px;padding:2px 7px;border-radius:10px;font-weight:500;color:#fff}
+.heart-team-chip.blue{background:#1a87c8}
+.heart-team-chip.red{background:#e8472a}
 .empty-feed{text-align:center;padding:3rem;color:#aaa;font-size:14px}
 .empty-feed i{font-size:36px;display:block;margin-bottom:10px}
 .stats-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:10px;margin-bottom:1.5rem}
@@ -69,7 +79,7 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;backgrou
 .team-stat-name{font-size:13px;color:#333;width:60px;flex-shrink:0;font-weight:500}
 .team-stat-bar-wrap{flex:1;height:8px;background:#e9ecef;border-radius:4px;overflow:hidden}
 .team-stat-bar{height:100%;border-radius:4px;transition:width 0.4s}
-.team-stat-count{font-size:12px;color:#888;width:20px;text-align:right}
+.team-stat-count{font-size:12px;color:#888;width:30px;text-align:right}
 .bottom-nav{border-top:1px solid #f1f3f5;padding:12px 0 0;display:flex;gap:4px;justify-content:center;margin-top:2rem}
 .nav-item{padding:8px 20px;border-radius:10px;border:none;background:none;cursor:pointer;font-size:12px;color:#999;display:flex;flex-direction:column;align-items:center;gap:3px;font-weight:500}
 .nav-item i{font-size:20px}
@@ -88,6 +98,12 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;backgrou
 .modal-btns button{flex:1;padding:10px;border-radius:8px;border:none;cursor:pointer;font-size:14px;font-weight:500}
 .modal-cancel{background:#f1f3f5;color:#666}
 .modal-confirm{background:#111;color:#fff}
+.heart-team-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-bottom:1rem}
+.heart-team-btn{padding:12px 6px;border-radius:10px;border:none;cursor:pointer;font-size:13px;font-weight:600;color:#fff;text-align:center;transition:all 0.15s;opacity:0.85}
+.heart-team-btn:hover{opacity:1;transform:translateY(-1px)}
+.heart-team-btn.blue{background:#1a87c8}
+.heart-team-btn.red{background:#e8472a}
+.heart-team-btn:disabled{opacity:0.3;cursor:not-allowed;transform:none}
 </style>
 </head>
 <body>
@@ -98,8 +114,11 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;backgrou
       <span class="dot" id="conn-dot"></span>
       <span id="conn-label">연결 중...</span>
     </div>
+    <div class="banner">
+      <img src="banner.png" alt="스마일멘토 시즌5">
+    </div>
     <div id="step-team">
-      <div class="page-title">우리 팀을 선택하세요</div>
+      <div class="page-title">함께 나누고 싶은 의견을 작성해주세요!</div>
       <div class="page-sub">팀을 선택한 후 의견을 입력해주세요</div>
       <div class="team-grid" id="team-grid"></div>
       <button class="btn btn-primary" style="width:100%" id="next-btn" disabled>
@@ -154,9 +173,12 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;backgrou
     <div id="tab-stats" style="display:none">
       <div class="stats-grid">
         <div class="stat-card"><div class="stat-num" id="total-count">0</div><div class="stat-label">전체 의견 수</div></div>
-        <div class="stat-card"><div class="stat-num" id="active-teams">0</div><div class="stat-label">참여 팀 수</div></div>
+        <div class="stat-card"><div class="stat-num" id="total-hearts">0</div><div class="stat-label">전체 하트 수</div></div>
       </div>
+      <div style="font-size:13px;font-weight:600;color:#444;margin-bottom:10px">팀별 의견 수</div>
       <div id="team-stats"></div>
+      <div style="font-size:13px;font-weight:600;color:#444;margin:16px 0 10px">팀별 하트 수</div>
+      <div id="team-heart-stats"></div>
     </div>
     <div class="bottom-nav">
       <button class="nav-item" id="nav-submit-btn2"><i class="ti ti-message-plus"></i><span>의견 제출</span></button>
@@ -165,6 +187,7 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;backgrou
   </div>
 </div>
 
+<!-- 비밀번호 모달 -->
 <div class="modal-overlay" id="pw-modal">
   <div class="modal">
     <h3>🔒 비밀번호 확인</h3>
@@ -178,9 +201,19 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;backgrou
   </div>
 </div>
 
+<!-- 하트 팀 선택 모달 -->
+<div class="modal-overlay" id="heart-modal">
+  <div class="modal">
+    <h3>❤️ 우리 팀은?</h3>
+    <p id="heart-modal-desc">하트를 누를 팀을 선택하세요</p>
+    <div class="heart-team-grid" id="heart-team-grid"></div>
+    <button class="modal-cancel" style="width:100%;padding:10px;border-radius:8px;border:none;cursor:pointer;font-size:14px;font-weight:500;background:#f1f3f5;color:#666" id="heart-cancel-btn">취소</button>
+  </div>
+</div>
+
 <script type="module">
 import { initializeApp } from "https://www.gstatic.com/firebasejs/12.14.0/firebase-app.js";
-import { getDatabase, ref, push, onValue, remove } from "https://www.gstatic.com/firebasejs/12.14.0/firebase-database.js";
+import { getDatabase, ref, push, onValue, remove, runTransaction, get } from "https://www.gstatic.com/firebasejs/12.14.0/firebase-database.js";
 
 const firebaseConfig = {
   apiKey: "AIzaSyD6TOv4ro8LGNDUfrmeXz5YOf6CYc7dbR0",
@@ -206,6 +239,7 @@ let selectedTeam = null;
 let currentFilter = 'all';
 let pendingDeleteKey = null;
 let pendingDeleteAll = false;
+let pendingHeartKey = null;
 
 // 연결 상태
 function setConnected(ok) {
@@ -228,7 +262,17 @@ TEAMS.forEach((t, i) => {
   grid.appendChild(b);
 });
 
-// 다음 버튼
+// 하트 팀 버튼 생성
+const heartGrid = document.getElementById('heart-team-grid');
+TEAMS.forEach((t, i) => {
+  const b = document.createElement('button');
+  b.className = 'heart-team-btn ' + TEAM_COLOR(i);
+  b.textContent = t;
+  b.dataset.teamIdx = i;
+  heartGrid.appendChild(b);
+});
+
+// 다음
 document.getElementById('next-btn').addEventListener('click', () => {
   if (selectedTeam === null) return;
   document.getElementById('step-team').style.display = 'none';
@@ -238,13 +282,11 @@ document.getElementById('next-btn').addEventListener('click', () => {
   document.getElementById('opinion-title').focus();
 });
 
-// 팀 변경
 document.getElementById('back-btn').addEventListener('click', () => {
   document.getElementById('step-input').style.display = 'none';
   document.getElementById('step-team').style.display = 'block';
 });
 
-// 글자 수 체크
 document.getElementById('opinion-title').addEventListener('input', updateBtn);
 document.getElementById('opinion-text').addEventListener('input', updateBtn);
 function updateBtn() {
@@ -264,7 +306,7 @@ document.getElementById('submit-btn').addEventListener('click', async () => {
   btn.disabled = true;
   btn.innerHTML = '전송 중...';
   try {
-    await push(opinionsRef, { team: selectedTeam, title, text, time: Date.now() });
+    await push(opinionsRef, { team: selectedTeam, title, text, time: Date.now(), hearts: {} });
     document.getElementById('step-input').style.display = 'none';
     document.getElementById('step-done').style.display = 'block';
     document.getElementById('done-sub').textContent = `${TEAMS[selectedTeam]} 의견이 전송되었습니다`;
@@ -279,7 +321,6 @@ document.getElementById('submit-btn').addEventListener('click', async () => {
   }
 });
 
-// 추가 제출
 document.getElementById('reset-btn').addEventListener('click', () => {
   selectedTeam = null;
   document.querySelectorAll('.team-btn').forEach(b => b.classList.remove('selected'));
@@ -353,14 +394,13 @@ document.getElementById('pw-input').addEventListener('keydown', (e) => {
   if (e.key === 'Enter') document.getElementById('pw-confirm-btn').click();
 });
 
-// 전체 삭제
 document.getElementById('clear-all-btn').addEventListener('click', () => {
   pendingDeleteAll = true;
   pendingDeleteKey = null;
   openPwModal('전체 삭제하려면 비밀번호를 입력하세요');
 });
 
-// 개별 삭제 (피드에서 동적으로 생성되는 버튼용)
+// 피드 삭제 이벤트
 document.getElementById('feed').addEventListener('click', (e) => {
   const btn = e.target.closest('[data-del-key]');
   if (!btn) return;
@@ -369,7 +409,54 @@ document.getElementById('feed').addEventListener('click', (e) => {
   openPwModal('의견을 삭제하려면 비밀번호를 입력하세요');
 });
 
-// 피드 필터
+// 하트 모달
+function openHeartModal(opinionKey, hearts) {
+  pendingHeartKey = opinionKey;
+  document.getElementById('heart-modal').classList.add('show');
+  // 이미 하트 누른 팀 비활성화
+  document.querySelectorAll('.heart-team-btn').forEach(b => {
+    const idx = parseInt(b.dataset.teamIdx);
+    const already = hearts && hearts[idx] === true;
+    b.disabled = already;
+    b.title = already ? '이미 하트를 눌렀습니다' : '';
+  });
+}
+
+document.getElementById('heart-cancel-btn').addEventListener('click', () => {
+  document.getElementById('heart-modal').classList.remove('show');
+  pendingHeartKey = null;
+});
+
+document.getElementById('heart-team-grid').addEventListener('click', async (e) => {
+  const btn = e.target.closest('.heart-team-btn');
+  if (!btn || btn.disabled) return;
+  const teamIdx = parseInt(btn.dataset.teamIdx);
+  document.getElementById('heart-modal').classList.remove('show');
+  if (pendingHeartKey) {
+    try {
+      const heartRef = ref(db, `opinions/${pendingHeartKey}/hearts/${teamIdx}`);
+      await runTransaction(heartRef, (current) => {
+        if (current === true) return; // 이미 눌렀으면 취소
+        return true;
+      });
+    } catch(e) {
+      alert('하트 처리 실패: ' + e.message);
+    }
+  }
+  pendingHeartKey = null;
+});
+
+// 피드 하트 버튼 이벤트
+document.getElementById('feed').addEventListener('click', (e) => {
+  const btn = e.target.closest('[data-heart-key]');
+  if (!btn) return;
+  const key = btn.dataset.heartKey;
+  const op = opinions.find(o => o.key === key);
+  if (!op) return;
+  openHeartModal(key, op.hearts || {});
+});
+
+// 필터
 document.getElementById('filter-row').addEventListener('click', (e) => {
   const chip = e.target.closest('[data-filter]');
   if (!chip) return;
@@ -381,6 +468,11 @@ function escapeHtml(s) {
   return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
 }
 
+function heartCount(hearts) {
+  if (!hearts) return 0;
+  return Object.values(hearts).filter(v => v === true).length;
+}
+
 function renderFeed() {
   const feed = document.getElementById('feed');
   const filtered = currentFilter === 'all' ? opinions : opinions.filter(o => o.team === parseInt(currentFilter));
@@ -390,6 +482,11 @@ function renderFeed() {
     feed.innerHTML = filtered.map(op => {
       const color = TEAM_COLOR(op.team);
       const t = new Date(op.time).toLocaleTimeString('ko-KR',{hour:'2-digit',minute:'2-digit'});
+      const hCount = heartCount(op.hearts);
+      const heartedTeams = op.hearts ? Object.entries(op.hearts).filter(([,v])=>v===true).map(([k])=>parseInt(k)) : [];
+      const teamChips = heartedTeams.map(ti =>
+        `<span class="heart-team-chip ${TEAM_COLOR(ti)}">${TEAMS[ti]}</span>`
+      ).join('');
       return `<div class="opinion-card">
         <div class="card-meta">
           <span class="team-tag ${color}">${TEAMS[op.team]}</span>
@@ -400,6 +497,12 @@ function renderFeed() {
         </div>
         ${op.title ? `<div class="card-title-text">${escapeHtml(op.title)}</div>` : ''}
         <div class="card-text">${escapeHtml(op.text)}</div>
+        <div class="card-footer">
+          <button class="heart-btn" data-heart-key="${op.key}">
+            ❤️ ${hCount}
+          </button>
+        </div>
+        ${heartedTeams.length > 0 ? `<div class="heart-teams">${teamChips}</div>` : ''}
       </div>`;
     }).join('');
   }
@@ -418,15 +521,29 @@ function buildFilters() {
 }
 
 function renderStats() {
+  const totalH = opinions.reduce((sum, op) => sum + heartCount(op.hearts), 0);
   document.getElementById('total-count').textContent = opinions.length;
-  document.getElementById('active-teams').textContent = new Set(opinions.map(o=>o.team)).size;
-  const max = Math.max(...TEAMS.map((_,i)=>opinions.filter(o=>o.team===i).length), 1);
+  document.getElementById('total-hearts').textContent = totalH;
+
+  const maxOp = Math.max(...TEAMS.map((_,i)=>opinions.filter(o=>o.team===i).length), 1);
   document.getElementById('team-stats').innerHTML = TEAMS.map((t,i)=>{
     const cnt = opinions.filter(o=>o.team===i).length;
     return `<div class="team-stat-row">
       <span class="team-stat-name">${t}</span>
-      <div class="team-stat-bar-wrap"><div class="team-stat-bar" style="width:${Math.round(cnt/max*100)}%;background:${BAR_COLOR(i)}"></div></div>
+      <div class="team-stat-bar-wrap"><div class="team-stat-bar" style="width:${Math.round(cnt/maxOp*100)}%;background:${BAR_COLOR(i)}"></div></div>
       <span class="team-stat-count">${cnt}</span>
+    </div>`;
+  }).join('');
+
+  const heartsByTeam = TEAMS.map((_,i) =>
+    opinions.reduce((sum, op) => sum + (op.hearts && op.hearts[i] === true ? 1 : 0), 0)
+  );
+  const maxH = Math.max(...heartsByTeam, 1);
+  document.getElementById('team-heart-stats').innerHTML = TEAMS.map((t,i)=>{
+    return `<div class="team-stat-row">
+      <span class="team-stat-name">${t}</span>
+      <div class="team-stat-bar-wrap"><div class="team-stat-bar" style="width:${Math.round(heartsByTeam[i]/maxH*100)}%;background:${BAR_COLOR(i)}"></div></div>
+      <span class="team-stat-count">❤️${heartsByTeam[i]}</span>
     </div>`;
   }).join('');
 }
