@@ -114,6 +114,11 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;backgrou
     <div class="banner">
       <img src="banner.png" alt="스마일멘토 시즌5">
     </div>
+    <div id="closed-banner" style="display:none;background:#fff8e1;border:1.5px solid #ffe082;border-radius:12px;padding:1.5rem;text-align:center;margin-bottom:1.2rem">
+      <div style="font-size:36px;margin-bottom:8px">🧃</div>
+      <div style="font-size:16px;font-weight:500;color:#7c5700;margin-bottom:4px">지금은 활동에 집중할 시간!</div>
+      <div style="font-size:14px;color:#a07020">의견 접수를 잠깐 멈춰주세요!</div>
+    </div>
     <div id="step-team">
       <div class="page-title">함께 나누고 싶은 의견을 작성해주세요!</div>
       <div class="page-sub">팀을 선택한 후 의견을 입력해주세요</div>
@@ -169,7 +174,10 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;backgrou
 
   <!-- 참여현황 뷰 -->
   <div class="view" id="view-stats">
-    <div class="page-title" style="margin-bottom:1rem">참여현황</div>
+    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:1rem">
+      <div class="page-title" style="margin-bottom:0">참여현황</div>
+      <button id="toggle-btn" style="display:inline-flex;align-items:center;gap:6px;padding:7px 14px;border-radius:8px;border:1.5px solid #dee2e6;background:#f1f3f5;color:#444;font-size:13px;font-weight:500;cursor:pointer"><i class="ti ti-player-pause" id="toggle-icon"></i><span id="toggle-label">접수 중</span></button>
+    </div>
     <div class="stats-top">
       <div class="stat-card">
         <div class="stat-num" id="total-count">0</div>
@@ -240,6 +248,7 @@ const firebaseConfig = {
 const fbApp = initializeApp(firebaseConfig);
 const db = getDatabase(fbApp);
 const opinionsRef = ref(db, 'opinions');
+const settingsRef = ref(db, 'settings/active');
 
 const TEAMS = ['Team1','Team2','Team3','Team4','Team5','Team6','Team7','Team8','Team9','Team10','Team11'];
 const TEAM_COLOR = i => i < 4 ? 'blue' : 'red';
@@ -261,6 +270,8 @@ let pendingDeleteKey = null;
 let pendingDeleteAll = false;
 let pendingHeartKey = null;
 let currentStatTab = 'opinion';
+let isActive = true;
+let pendingToggle = false;
 
 // 연결 상태
 function setConnected(ok) {
@@ -383,10 +394,13 @@ document.getElementById('pw-confirm-btn').addEventListener('click', async () => 
   }
   document.getElementById('pw-modal').classList.remove('show');
   try {
-    if (pendingDeleteAll) await remove(opinionsRef);
+    if (pendingToggle) {
+      const { set } = await import('https://www.gstatic.com/firebasejs/12.14.0/firebase-database.js');
+      await set(settingsRef, !isActive);
+    } else if (pendingDeleteAll) await remove(opinionsRef);
     else if (pendingDeleteKey) await remove(ref(db, 'opinions/' + pendingDeleteKey));
-  } catch(e) { alert('삭제 실패: ' + e.message); }
-  pendingDeleteKey = null; pendingDeleteAll = false;
+  } catch(e) { alert('처리 실패: ' + e.message); }
+  pendingDeleteKey = null; pendingDeleteAll = false; pendingToggle = false;
 });
 
 document.getElementById('pw-input').addEventListener('keydown', e => {
@@ -593,6 +607,45 @@ onValue(opinionsRef, snapshot => {
 });
 
 renderFeed();
+
+function applyActiveState(active) {
+  isActive = active;
+  const banner = document.getElementById("closed-banner");
+  const stepTeam = document.getElementById("step-team");
+  const stepInput = document.getElementById("step-input");
+  const stepDone = document.getElementById("step-done");
+  const toggleBtn = document.getElementById("toggle-btn");
+  const toggleIcon = document.getElementById("toggle-icon");
+  const toggleLabel = document.getElementById("toggle-label");
+  if (active) {
+    banner.style.display = "none";
+    if (stepDone.style.display === "none" && stepInput.style.display === "none") stepTeam.style.display = "block";
+    toggleBtn.style.background = "#e8f5e9";
+    toggleBtn.style.borderColor = "#a5d6a7";
+    toggleBtn.style.color = "#2e7d32";
+    toggleIcon.className = "ti ti-player-play";
+    toggleLabel.textContent = "접수 중";
+  } else {
+    banner.style.display = "block";
+    stepTeam.style.display = "none";
+    stepInput.style.display = "none";
+    toggleBtn.style.background = "#fff3e0";
+    toggleBtn.style.borderColor = "#ffcc80";
+    toggleBtn.style.color = "#e65100";
+    toggleIcon.className = "ti ti-player-pause";
+    toggleLabel.textContent = "접수 중단";
+  }
+}
+
+onValue(settingsRef, snapshot => {
+  const active = snapshot.val() !== false;
+  applyActiveState(active);
+});
+
+document.getElementById("toggle-btn").addEventListener("click", () => {
+  pendingToggle = true;
+  openPwModal(isActive ? "접수를 중단하려면 비밀번호를 입력하세요" : "접수를 재개하려면 비밀번호를 입력하세요");
+});
 </script>
 </body>
 </html>
