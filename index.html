@@ -63,6 +63,16 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;backgrou
 .hot-2 .hot-badge{background:#9e9e9e}
 .hot-3 .hot-badge{background:#f97316}
 .hot-divider{border:none;border-top:1.5px dashed #dee2e6;margin:14px 0 10px}
+.topic-rank-section{margin-bottom:1.4rem}
+.topic-rank-title{font-size:14px;font-weight:700;color:#111;margin-bottom:10px;padding-bottom:6px;border-bottom:1.5px solid #f1f3f5}
+.topic-rank-row{display:flex;align-items:center;gap:8px;margin-bottom:8px}
+.topic-rank-medal{font-size:16px;width:24px;flex-shrink:0;text-align:center}
+.topic-rank-team-tag{font-size:12px;font-weight:700;padding:3px 10px;border-radius:6px;color:#fff;width:62px;text-align:center;flex-shrink:0}
+.topic-rank-team-tag.blue{background:#1a87c8}
+.topic-rank-team-tag.red{background:#e8472a}
+.topic-rank-bar-wrap{flex:1;height:7px;background:#e9ecef;border-radius:4px;overflow:hidden}
+.topic-rank-bar{height:100%;border-radius:4px;transition:width 0.4s}
+.topic-rank-hearts{font-size:12px;color:#e8472a;font-weight:600;width:36px;text-align:right;flex-shrink:0}
 .card-meta{display:flex;align-items:center;justify-content:space-between;margin-bottom:8px}
 .card-meta-left{display:flex;align-items:center;gap:6px;flex-wrap:wrap}
 .team-tag{font-size:12px;font-weight:700;padding:3px 10px;border-radius:6px;color:#fff}
@@ -212,11 +222,12 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;backgrou
         <div class="stat-label">전체 참여 수</div>
       </div>
     </div>
-    <div class="stat-sub-tabs">
+    <div class="stat-sub-tabs" style="overflow-x:auto;white-space:nowrap;padding-bottom:4px;flex-wrap:nowrap">
       <button class="stat-sub-btn active" id="sub-opinion-btn">팀별 의견</button>
       <button class="stat-sub-btn" id="sub-heart-btn">팀별 하트</button>
       <button class="stat-sub-btn" id="sub-participation-btn">팀별 참여</button>
       <button class="stat-sub-btn" id="sub-ranking-btn">🍦 순위표</button>
+      <button class="stat-sub-btn" id="sub-topic-btn">📋 주제별 순위</button>
     </div>
     <div id="stat-detail"></div>
     <div class="bottom-nav">
@@ -536,10 +547,11 @@ document.getElementById('sub-opinion-btn').addEventListener('click', () => setSt
 document.getElementById('sub-heart-btn').addEventListener('click', () => setStatTab('heart'));
 document.getElementById('sub-participation-btn').addEventListener('click', () => setStatTab('participation'));
 document.getElementById('sub-ranking-btn').addEventListener('click', () => setStatTab('ranking'));
+document.getElementById('sub-topic-btn').addEventListener('click', () => setStatTab('topic'));
 
 function setStatTab(tab) {
   currentStatTab = tab;
-  ['opinion','heart','participation','ranking'].forEach(t => {
+  ['opinion','heart','participation','ranking','topic'].forEach(t => {
     document.getElementById(`sub-${t}-btn`).classList.toggle('active', t === tab);
   });
   renderStatDetail();
@@ -596,6 +608,48 @@ function renderStatDetail() {
               ${TEAMS[idx]}
             </button>`).join('')}
         </div>`).join('')}`;
+
+  } else if (currentStatTab === 'topic') {
+    const TOPICS = ['응원메시지자랑','우리가꿈꾸는활동','재미있는활동아이디어','자유입력'];
+    const TOPIC_EMOJI = ['📣','🌟','💡','✏️'];
+    const MEDAL = ['🥇','🥈','🥉'];
+
+    let html = '';
+    TOPICS.forEach((topic, ti) => {
+      const topicOps = opinions.filter(o => (o.topic || '자유입력') === topic);
+      if (topicOps.length === 0) {
+        html += `<div class="topic-rank-section">
+          <div class="topic-rank-title">${TOPIC_EMOJI[ti]} ${topic}</div>
+          <div style="font-size:13px;color:#aaa;padding:10px 0 14px">아직 의견이 없습니다</div>
+        </div>`;
+        return;
+      }
+      // 팀별 하트 합산
+      const teamHearts = TEAMS.map((_,i) =>
+        topicOps.filter(o=>o.team===i).reduce((s,op)=>s+heartCount(op.hearts),0)
+      );
+      const ranked = TEAMS
+        .map((t,i) => ({ idx:i, name:t, hearts: teamHearts[i] }))
+        .filter(t => t.hearts > 0)
+        .sort((a,b) => b.hearts - a.hearts)
+        .slice(0,3);
+
+      const rows = ranked.map((t,ri) => `
+        <div class="topic-rank-row">
+          <span class="topic-rank-medal">${MEDAL[ri]}</span>
+          <span class="topic-rank-team-tag ${TEAM_COLOR(t.idx)}">${t.name}</span>
+          <div class="topic-rank-bar-wrap">
+            <div class="topic-rank-bar" style="width:${Math.round(t.hearts/ranked[0].hearts*100)}%;background:${BAR_COLOR(t.idx)}"></div>
+          </div>
+          <span class="topic-rank-hearts">❤️${t.hearts}</span>
+        </div>`).join('');
+
+      html += `<div class="topic-rank-section">
+        <div class="topic-rank-title">${TOPIC_EMOJI[ti]} ${topic}</div>
+        ${rows || '<div style="font-size:13px;color:#aaa;padding:6px 0">하트가 없습니다</div>'}
+      </div>`;
+    });
+    el.innerHTML = html;
   }
 }
 
