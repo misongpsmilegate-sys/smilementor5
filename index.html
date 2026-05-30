@@ -55,6 +55,14 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;backgrou
 .feed{display:flex;flex-direction:column;gap:10px}
 .opinion-card{padding:14px 16px;border-radius:12px;background:#f8f9fa;border:1px solid #e9ecef;animation:slideIn 0.3s ease}
 @keyframes slideIn{from{opacity:0;transform:translateY(-6px)}to{opacity:1;transform:translateY(0)}}
+.opinion-card.hot-1{background:linear-gradient(135deg,#fff8e1 0%,#fff3cd 100%);border:1.5px solid #ffd54f;position:relative}
+.opinion-card.hot-2{background:linear-gradient(135deg,#f5f5f5 0%,#ececec 100%);border:1.5px solid #bdbdbd;position:relative}
+.opinion-card.hot-3{background:linear-gradient(135deg,#fff3e0 0%,#ffe0b2 100%);border:1.5px solid #ffb74d;position:relative}
+.hot-badge{position:absolute;top:-1px;right:10px;font-size:11px;font-weight:700;padding:3px 8px;border-radius:0 0 8px 8px;color:#fff;letter-spacing:0.3px}
+.hot-1 .hot-badge{background:#f59e0b}
+.hot-2 .hot-badge{background:#9e9e9e}
+.hot-3 .hot-badge{background:#f97316}
+.hot-divider{border:none;border-top:1.5px dashed #dee2e6;margin:14px 0 10px}
 .card-meta{display:flex;align-items:center;justify-content:space-between;margin-bottom:8px}
 .card-meta-left{display:flex;align-items:center;gap:6px;flex-wrap:wrap}
 .team-tag{font-size:12px;font-weight:700;padding:3px 10px;border-radius:6px;color:#fff}
@@ -230,7 +238,7 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;backgrou
 
 <script type="module">
 import { initializeApp } from "https://www.gstatic.com/firebasejs/12.14.0/firebase-app.js";
-import { getDatabase, ref, push, onValue, runTransaction } from "https://www.gstatic.com/firebasejs/12.14.0/firebase-database.js";
+import { getDatabase, ref, push, onValue, onChildAdded, onChildChanged, onChildRemoved, runTransaction } from "https://www.gstatic.com/firebasejs/12.14.0/firebase-database.js";
 
 const firebaseConfig = {
   apiKey: "AIzaSyD6TOv4ro8LGNDUfrmeXz5YOf6CYc7dbR0",
@@ -474,38 +482,39 @@ function heartCount(hearts) {
 
 function renderFeed() {
   const feed = document.getElementById('feed');
-  const filtered = currentFilter === 'all'
-    ? opinions
-    : opinions.filter(o => (o.topic || '자유입력') === currentFilter);
 
-  if (filtered.length === 0) {
+  // 하트 TOP3 계산 (하트 1개 이상인 것만)
+  const hotKeys = [...opinions]
+    .filter(op => heartCount(op.hearts) > 0)
+    .sort((a,b) => heartCount(b.hearts) - heartCount(a.hearts))
+    .slice(0,3)
+    .map(op => op.key);
+
+  if (opinions.length === 0) {
     feed.innerHTML = '<div class="empty-feed"><i class="ti ti-inbox"></i>아직 제출된 의견이 없습니다</div>';
-  } else {
-    const likedMap = getLikedMap();
-    feed.innerHTML = filtered.map(op => {
-      const color = TEAM_COLOR(op.team);
-      const t = new Date(op.time).toLocaleTimeString('ko-KR',{hour:'2-digit',minute:'2-digit'});
-      const hCount = heartCount(op.hearts);
-      const liked = likedMap[op.key] !== undefined;
-      const topicLabel = op.topic || '자유입력';
-      return `<div class="opinion-card">
-        <div class="card-meta">
-          <div class="card-meta-left">
-            <span class="team-tag ${color}">${TEAMS[op.team]}</span>
-            <span class="topic-tag">${escapeHtml(topicLabel)}</span>
-          </div>
-          <span class="card-time">${t}</span>
-        </div>
-        ${op.title && op.title !== topicLabel ? `<div class="card-title-text">${escapeHtml(op.title)}</div>` : ''}
-        <div class="card-text">${escapeHtml(op.text)}</div>
-        <div class="card-footer">
-          <button class="heart-btn${liked?' liked':''}" data-heart-key="${op.key}">
-            ❤️ ${hCount}${liked?' (눌렀음)':''}
-          </button>
-        </div>
-      </div>`;
-    }).join('');
+    buildFilters(); return;
   }
+
+  // 순서: HOT TOP3 먼저, 그 다음 나머지 최신순
+  const hotOps = hotKeys.map(k => opinions.find(o => o.key === k)).filter(Boolean);
+  const restOps = opinions.filter(op => !hotKeys.includes(op.key));
+
+  let html = '';
+  if (hotOps.length > 0) {
+    hotOps.forEach((op, i) => {
+      const rank = i + 1;
+      const visible = cardVisible(op);
+      html += `<div class="opinion-card hot-${rank}" data-key="${op.key}" style="${visible?'':'display:none'}">${cardHTML(op, rank)}</div>`;
+    });
+    html += '<hr class="hot-divider">';
+  }
+  restOps.forEach(op => {
+    const visible = cardVisible(op);
+    html += `<div class="opinion-card" data-key="${op.key}" style="${visible?'':'display:none'}">${cardHTML(op, 0)}</div>`;
+  });
+
+  feed.innerHTML = html;
+  checkEmpty();
   buildFilters();
 }
 
@@ -588,16 +597,125 @@ function renderStatDetail() {
   }
 }
 
-// Firebase 리스너
+// ── 카드 HTML 생성 ───────────────────────────────────────
+function cardHTML(op, hotRank) {
+  const color = TEAM_COLOR(op.team);
+  const t = new Date(op.time).toLocaleTimeString('ko-KR',{hour:'2-digit',minute:'2-digit'});
+  const hCount = heartCount(op.hearts);
+  const liked = getLikedMap()[op.key] !== undefined;
+  const topicLabel = op.topic || '자유입력';
+  const badgeMap = {1:'🥇 인기 1위', 2:'🥈 인기 2위', 3:'🥉 인기 3위'};
+  const badge = hotRank && badgeMap[hotRank] ? `<span class="hot-badge">${badgeMap[hotRank]}</span>` : '';
+  return `${badge}<div class="card-meta">
+      <div class="card-meta-left">
+        <span class="team-tag ${color}">${TEAMS[op.team]}</span>
+        <span class="topic-tag">${escapeHtml(topicLabel)}</span>
+      </div>
+      <span class="card-time">${t}</span>
+    </div>
+    ${op.title && op.title !== topicLabel ? `<div class="card-title-text">${escapeHtml(op.title)}</div>` : ''}
+    <div class="card-text">${escapeHtml(op.text)}</div>
+    <div class="card-footer">
+      <button class="heart-btn${liked?' liked':''}" data-heart-key="${op.key}">
+        ❤️ ${hCount}${liked?' (눌렀음)':''}
+      </button>
+    </div>`;
+}
+
+// 카드가 현재 필터에 보여야 하는지
+function cardVisible(op) {
+  return currentFilter === 'all' || (op.topic || '자유입력') === currentFilter;
+}
+
+// 빈 상태 체크
+function checkEmpty() {
+  const feed = document.getElementById('feed');
+  const visible = [...feed.querySelectorAll('.opinion-card')].filter(el => el.style.display !== 'none');
+  let empty = feed.querySelector('.empty-feed');
+  if (visible.length === 0) {
+    if (!empty) {
+      empty = document.createElement('div');
+      empty.className = 'empty-feed';
+      empty.innerHTML = '<i class="ti ti-inbox"></i>아직 제출된 의견이 없습니다';
+      feed.appendChild(empty);
+    }
+  } else {
+    if (empty) empty.remove();
+  }
+}
+
+// ── Firebase 리스너 (child 단위) ─────────────────────────
+let initialLoadDone = false;
+
+onChildAdded(opinionsRef, child => {
+  setConnected(true);
+  const op = { key: child.key, ...child.val() };
+
+  // opinions 배열 앞에 추가 (최신순)
+  opinions.unshift(op);
+
+  // 초기 로딩 중에는 DOM 직접 조작하지 않음 (아래 onValue에서 한번에 처리)
+  if (!initialLoadDone) return;
+
+  // 새 카드 DOM 추가
+  const feed = document.getElementById('feed');
+  feed.querySelector('.empty-feed')?.remove();
+
+  const el = document.createElement('div');
+  el.className = 'opinion-card';
+  el.dataset.key = op.key;
+  el.style.display = cardVisible(op) ? '' : 'none';
+  el.innerHTML = cardHTML(op);
+  feed.prepend(el);
+
+  buildFilters();
+  updateStatNumbers();
+});
+
+onChildChanged(opinionsRef, child => {
+  const op = { key: child.key, ...child.val() };
+  const idx = opinions.findIndex(o => o.key === op.key);
+  if (idx !== -1) opinions[idx] = op;
+
+  // 해당 카드의 하트 버튼만 조용히 업데이트 (번쩍임 없음)
+  // TOP3 재배치는 새로고침 시 반영
+  const el = document.querySelector(`.opinion-card[data-key="${op.key}"]`);
+  if (el) {
+    const hCount = heartCount(op.hearts);
+    const liked = getLikedMap()[op.key] !== undefined;
+    const btn = el.querySelector('.heart-btn');
+    if (btn) {
+      btn.textContent = '';
+      btn.innerHTML = `❤️ ${hCount}${liked?' (눌렀음)':''}`;
+    }
+  }
+  updateStatNumbers();
+});
+
+onChildRemoved(opinionsRef, child => {
+  opinions = opinions.filter(o => o.key !== child.key);
+  const el = document.querySelector(`.opinion-card[data-key="${child.key}"]`);
+  if (el) el.remove();
+  checkEmpty();
+  buildFilters();
+  updateStatNumbers();
+});
+
+// 초기 전체 로드 (한 번만)
 onValue(opinionsRef, snapshot => {
+  if (initialLoadDone) return;
+  initialLoadDone = true;
   setConnected(true);
   opinions = [];
   snapshot.forEach(child => {
     opinions.unshift({ key: child.key, ...child.val() });
   });
-  renderFeed();
+  renderFeed(); // 최초 1회 전체 렌더
+}, { onlyOnce: true });
+
+function updateStatNumbers() {
   if (document.getElementById('view-stats').classList.contains('active')) renderStats();
-});
+}
 
 onValue(activeRef, snapshot => {
   const active = snapshot.val() !== false;
@@ -618,8 +736,6 @@ onValue(questionRef, snapshot => {
   const q = snapshot.val() || '자유입력';
   applyQuestion(q);
 });
-
-renderFeed();
 </script>
 <style>
 @keyframes spin{from{transform:rotate(0deg)}to{transform:rotate(360deg)}}
