@@ -76,6 +76,7 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;backgrou
 .heart-btn{display:inline-flex;align-items:center;gap:5px;padding:5px 12px;border-radius:20px;border:1.5px solid #fecdd3;background:#fff5f5;cursor:pointer;font-size:13px;color:#e8472a;font-weight:500;transition:all 0.15s}
 .heart-btn:hover{background:#ffe4e6}
 .heart-btn.liked{background:#e8472a;color:#fff;border-color:#e8472a;cursor:default}
+.inactive .heart-btn:not(.liked){opacity:0.35;cursor:not-allowed}
 .empty-feed{text-align:center;padding:3rem;color:#aaa;font-size:14px}
 .empty-feed i{font-size:36px;display:block;margin-bottom:10px}
 .stats-top{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-bottom:1.2rem}
@@ -411,6 +412,7 @@ document.getElementById('reset-btn').addEventListener('click', () => {
 document.getElementById('feed').addEventListener('click', e => {
   const heartBtn = e.target.closest('[data-heart-key]');
   if (heartBtn && !heartBtn.classList.contains('liked')) {
+    if (!isActive) return; // 접수 중단 시 하트 비활성화
     pendingHeartKey = heartBtn.dataset.heartKey;
     openHeartModal();
   }
@@ -726,9 +728,11 @@ onValue(activeRef, snapshot => {
   if (active) {
     banner.style.display = 'none';
     if (done.style.display === 'none') form.style.display = 'block';
+    document.getElementById('feed').classList.remove('inactive');
   } else {
     banner.style.display = 'block';
     form.style.display = 'none';
+    document.getElementById('feed').classList.add('inactive');
   }
 });
 
